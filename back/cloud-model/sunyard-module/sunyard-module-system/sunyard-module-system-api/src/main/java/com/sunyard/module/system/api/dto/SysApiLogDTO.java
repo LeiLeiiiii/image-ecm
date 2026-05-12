@@ -1,0 +1,81 @@
+package com.sunyard.module.system.api.dto;
+
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * <p>
+ * 操作日志表
+ * </p>
+ *
+ * @author 吴丙扬
+ * @since 2022-01-06
+ */
+@Data
+public class SysApiLogDTO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键
+     */
+    private Long id;
+
+    /**
+     * 用户id
+     */
+    private Long userId;
+
+    /**
+     * 系统区分
+     */
+    private String logSystem;
+
+    /**
+     * 请求-ip
+     */
+    private String requestIp;
+
+    /**
+     * 请求-接口url
+     */
+    private String requestUrl;
+
+    /**
+     * 请求-接口-中文功能描述
+     */
+    private String requestDesc;
+
+    /**
+     * 请求-入参
+     */
+    private String requestParams;
+
+    /**
+     * 日志状态(成功:0,失败:1,异常:2)
+     */
+    private Integer responseCode;
+
+    /**
+     * 异常信息
+     */
+    private String exceptionMsg;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 删除状态(否:0,是:1)
+     */
+    private Integer isDeleted;
+
+}

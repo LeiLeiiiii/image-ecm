@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysUserAdminMapper">
+
+    <select id="search" resultType="com.sunyard.module.system.api.dto.SysUserAdminDTO">
+        SELECT
+            a.*,
+            b.name AS dept_name,
+            c.name AS inst_name
+        FROM sys_user_admin a
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id AND c.newlevel=0
+            LEFT JOIN sys_deptS b ON a.dept_id = b.dept_id AND b.newlevel=0
+        <if test="null != deptId and 0!=deptId">
+            JOIN (
+                SELECT
+                    d.*
+                FROM sys_dept d
+                WHERE
+                    d.dept_id=#{deptId}
+                    OR d.parent_id=#{deptId}
+                ) dd ON a.dept_id=dd.dept_id
+        </if>
+        WHERE
+            1=1
+            AND a.is_deleted=0
+            AND a.user_id != #{userId}
+        <if test="null != user.code and '' != user.code">
+            AND a.code LIKE CONCAT(CONCAT(#{user.code},'%'))
+        </if>
+        <if test="null != user.name and '' != user.name">
+            AND a.name LIKE CONCAT(CONCAT(#{user.name},'%'))
+        </if>
+        <if test="null != user.deptId">
+            AND a.dept_id = #{user.deptId}
+        </if>
+        <if test="null != user.instId">
+            AND a.inst_id = #{user.instId}
+        </if>
+        <if test="null != user.state">
+            AND a.state = #{user.state}
+        </if>
+        ORDER BY a.create_time DESC
+    </select>
+    <select id="selectOrg" resultType="com.sunyard.module.system.api.dto.SysUserAdminDTO">
+        SELECT
+            a.*,
+            b.name AS dept_name,
+            c.name AS inst_name,
+            c.inst_no,
+            m.perms AS default_menu
+        FROM sys_user_admin a
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id AND c.newlevel = 0
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id AND b.newlevel = 0
+            LEFT JOIN sys_menu_default md ON a.user_id = md.user_id AND md.is_deleted = 0
+            LEFT JOIN sys_menu m ON m.menu_id = md.menu_id AND m.is_deleted = 0
+        WHERE
+            1 = 1
+            AND a.is_deleted = 0
+            AND a.user_id = #{userId}
+    </select>
+    <select id="selectThink" resultType="com.sunyard.module.system.api.dto.SysUserAdminDTO">
+        SELECT
+            a.*,
+            b.name AS dept_name,
+            c.name AS inst_name
+        FROM sys_user_admin a
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id
+        WHERE
+            a.name LIKE CONCAT('%', CONCAT(#{thinkString}, '%'))
+            OR a.login_name LIKE CONCAT('%', CONCAT(#{thinkString}, '%'))
+            OR a.user_id LIKE CONCAT('%', CONCAT(#{thinkString}, '%'))
+    </select>
+
+</mapper>

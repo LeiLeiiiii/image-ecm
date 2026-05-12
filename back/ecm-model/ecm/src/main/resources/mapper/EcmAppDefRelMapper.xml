@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmAppDefRelMapper">
+    <!-- todo 挪位置-->
+    <select id="searchAllAppDefRelInfo" resultType="com.sunyard.ecm.vo.EcmAppDefAttrVO">
+        SELECT
+            a.*,
+            b.parent AS parent
+        FROM ecm_app_def a
+            LEFT JOIN ecm_app_def_rel AS b ON a.app_code = b.app_code
+        ORDER BY a.app_sort
+    </select>
+
+    <!--  todo 无需适配-->
+    <!-- todo 挪位置-->
+    <select id="searchAllAppDefRelInfo" resultType="com.sunyard.ecm.vo.EcmAppDefAttrVO" databaseId="oracle">
+        SELECT a.*,
+               b.parent AS parent
+        FROM ecm_app_def a
+                 LEFT JOIN ecm_app_def_rel b ON a.app_code = b.app_code
+        ORDER BY a.app_sort
+    </select>
+</mapper>

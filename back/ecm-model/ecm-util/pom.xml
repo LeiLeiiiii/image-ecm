@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sunyard.sunecm</groupId>
+        <artifactId>sunecm</artifactId>
+        <version>6.4.2</version>
+    </parent>
+    <artifactId>ecm-util</artifactId>
+
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.sunyard.sunecm</groupId>
+            <artifactId>ecm-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.insurance</groupId>
+            <artifactId>sunecm-url-encode</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.insurance</groupId>
+            <artifactId>sunecm_outer</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>org.ow2.asm</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
+
+</project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmFileLabelMapper">
+
+    <delete id="deleteBatchByFileId" parameterType="java.util.Collection">
+        delete from ecm_file_label
+        where file_id in
+        <foreach collection="coll" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

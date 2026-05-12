@@ -1,0 +1,9 @@
+server:
+  port: 58086
+spring:
+  application:
+    name: afm-service
+
+  profiles:
+    active: @profiles.active@
+    include: log,lb,monitor,mq,xxl-job,sunedm

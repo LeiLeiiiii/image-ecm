@@ -1,0 +1,30 @@
+#################### 注册中心相关配置 ####################
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: 172.1.2.189:8848
+        namespace: 29a146e1-37d0-4ae1-a997-60f4af17e402
+        service: ${spring.application.name}
+--- #################### 配置中心相关配置 ####################
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      config:
+        server-addr: 172.1.2.189:8848
+        namespace: 29a146e1-37d0-4ae1-a997-60f4af17e402
+        file-extension: yaml
+        shared-configs:
+          - data-id: base.yaml
+        extension-configs:
+          - data-id: ${spring.application.name}.yaml
+            refresh: true
+--- #################### 开发日志等级调整 ####################
+logging:
+  level:
+    root: debug
+    com.alibaba.cloud.nacos.client.NacosPropertySourceBuilder: debug

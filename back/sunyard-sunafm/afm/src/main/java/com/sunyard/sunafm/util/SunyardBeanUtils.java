@@ -1,0 +1,41 @@
+package com.sunyard.sunafm.util;
+
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author lw
+ * @Date 2023/4/12 15:37
+ * @description: 获取bean工具类
+ */
+//todo hutool包有
+@Component
+public class SunyardBeanUtils implements ApplicationContextAware {
+    protected static ApplicationContext applicationContext ;
+
+    @Override
+    public void setApplicationContext(ApplicationContext arg0) throws BeansException {
+        if (applicationContext == null) {
+            applicationContext = arg0;
+        }
+
+    }
+    public static Object getBean(String name) {
+        //name表示其他要注入的注解name名
+        return applicationContext.getBean(name);
+    }
+
+    /**
+     * 拿到ApplicationContext对象实例后就可以手动获取Bean的注入实例对象
+     */
+    public static <T> T getBean(Class<T> clazz) {
+        return applicationContext.getBean(clazz);
+    }
+
+    public static void main(String[] args) {
+        double sqrt = Math.sqrt(2410000);
+        System.out.println(sqrt*4);
+    }
+}

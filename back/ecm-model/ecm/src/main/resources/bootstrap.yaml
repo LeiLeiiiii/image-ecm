@@ -1,0 +1,10 @@
+server:
+  port: 58081
+
+spring:
+  application:
+    name: ecm-service
+
+  profiles:
+    active: @profiles.active@
+    include: log,lb,monitor,ocr,rabbitmq,sunicms

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocSysAnnounMapper">
+
+    <select id="selectListAnnounExtend" resultType="com.sunyard.edm.dto.DocSysAnnounDTO">
+        SELECT
+            DISTINCT a.*,
+            b.type,
+            b.rel_id
+        FROM doc_sys_announ a
+            LEFT JOIN doc_sys_announ_user b ON a.ananoun_id = b.ananoun_id
+        WHERE
+            a.is_deleted = 0
+            AND b.is_deleted = 0
+            AND (
+                (b.rel_id = #{relId1} AND b.type = #{type1})
+                OR (b.rel_id = #{relId2} AND b.type = #{type2})
+                OR (b.rel_id = #{relId3} AND b.type = #{type3})
+            <if test="teams != null and teams.size() > 0">
+                OR (b.rel_id IN
+                    <foreach collection="teams" item="team" open="(" separator="," close=")">
+                        #{team}
+                    </foreach>
+                    AND b.type = #{type4}
+                    )
+            </if>
+                )
+    </select>
+
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmDtdAttrMapper">
+
+    <!--TODO 代码可以实现-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into ecm_dtd_attr(dtd_attr_id, dtd_type_id, attr_code, attr_name,attr_sort,regex,
+        check_vaule,create_user,create_time,update_user,update_time) values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.dtdAttrId},#{it.dtdTypeId},#{it.attrCode},#{it.attrName},#{it.attrSort},#{it.regex},#{it.checkVaule},#{it.createUser},#{it.createTime},#{it.updateUser},#{it.updateTime})
+        </foreach>
+    </insert>
+    <!--TODO 代码可以实现-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertList" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_dtd_attr(dtd_attr_id, dtd_type_id, attr_code, attr_name,attr_sort,regex,
+        check_vaule,create_user,create_time,update_user,update_time)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{it.dtdAttrId},#{it.dtdTypeId},#{it.attrCode},#{it.attrName},#{it.attrSort},#{it.regex},#{it.checkVaule},#{it.createUser},#{it.createTime},#{it.updateUser},#{it.updateTime}
+            from dual)
+        </foreach>
+    </insert>
+</mapper>

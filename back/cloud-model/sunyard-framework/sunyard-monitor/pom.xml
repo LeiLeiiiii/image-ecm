@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sunyard.cloud</groupId>
+        <artifactId>sunyard-framework</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+    </parent>
+    <artifactId>sunyard-monitor</artifactId>
+
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-starter-redis</artifactId>
+        </dependency>
+        <!-- 监控相关 -->
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+        </dependency>
+        <!-- 数据库表结构 -->
+        <dependency>
+            <groupId>cn.smallbun.screw</groupId>
+            <artifactId>screw-core</artifactId>
+            <!--解决漏扫问题，采用统一的logback-classsic,其他包中有依赖这个 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+        </dependency>
+    </dependencies>
+</project>

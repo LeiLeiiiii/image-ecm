@@ -1,0 +1,9 @@
+server:
+  port: 58084
+spring:
+  application:
+    name: edm-service
+
+  profiles:
+    active: @profiles.active@
+    include: log,lb,monitor

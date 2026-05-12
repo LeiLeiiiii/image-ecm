@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysMenuMapper">
+    <select id="getMenuByUserIdAll" resultType="com.sunyard.module.system.po.SysMenu">
+        SELECT DISTINCT
+        a.menu_id,
+        a.parent_id,
+        a.menu_name,
+        a.menu_system,
+        a.perms,
+        a.path,
+        a.component,
+        a.menu_type,
+        a.is_frame,
+        a.is_cache,
+        a.icon,
+        a.status,
+        a.visible,
+        a.order_num,
+        a.remark
+        FROM sys_menu a
+        <if test="null != userId and '' != userId">
+            JOIN sys_role_menu b ON a.menu_id=b.menu_id AND b.is_deleted=0
+            JOIN sys_role_user c ON b.role_id=c.role_id AND c.is_deleted=0
+        </if>
+        WHERE
+        a.is_deleted=0
+        AND a.status=0
+        <if test="null != userId and '' != userId">
+            AND c.user_id=#{userId}
+        </if>
+        <if test="null != type">
+            AND a.menu_system=#{type}
+        </if>
+        ORDER BY a.order_num ASC
+    </select>
+
+    <select id="getMenuByUserId" resultType="com.sunyard.module.system.po.SysMenu">
+        SELECT
+        a.menu_id,
+        a.parent_id,
+        a.menu_name,
+        a.menu_system,
+        a.perms,
+        a.path,
+        a.component,
+        a.menu_type,
+        a.is_frame,
+        a.is_cache,
+        a.icon,
+        a.status,
+        a.visible,
+        a.order_num,
+        a.remark
+        FROM sys_menu a
+        <if test="null != userId and '' != userId">
+            JOIN sys_role_menu b ON a.menu_id=b.menu_id AND b.is_deleted=0
+            JOIN sys_role_user c ON b.role_id=c.role_id AND c.is_deleted=0
+        </if>
+        WHERE
+        a.is_deleted=0
+        AND a.status=0
+        <if test="null != userId and '' != userId">
+            AND c.user_id=#{userId}
+        </if>
+        <if test="null != type">
+            AND a.menu_system=#{type}
+        </if>
+        AND a.menu_type != 'B'
+        GROUP BY
+        a.menu_id,
+        a.parent_id,
+        a.menu_name,
+        a.menu_system,
+        a.perms,
+        a.path,
+        a.component,
+        a.menu_type,
+        a.is_frame,
+        a.is_cache,
+        a.icon,
+        a.status,
+        a.visible,
+        a.order_num,
+        a.remark
+        ORDER BY order_num ASC
+    </select>
+
+</mapper>

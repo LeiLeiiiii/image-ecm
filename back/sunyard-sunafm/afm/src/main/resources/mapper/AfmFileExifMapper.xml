@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.sunafm.mapper.AfmFileExifMapper">
+
+    <select id="queryFileByNoteId" resultType="com.sunyard.sunafm.dto.AfmDetOnlineImgDetDTO">
+        SELECT
+            *
+        FROM afm_file_exif AS a
+            LEFT JOIN afm_image_dup_assoc AS b ON a.exif_id = b.assoc_exif_id
+        WHERE
+            a.is_deleted = 0
+            AND a.source_sys != 'AFM'
+            AND b.dup_note_id = #{noteId}
+            AND b.similarity >= #{fileSimilarity}
+        <if test="exifId != null and exifId != ''">
+            AND a.exif_id != #{exifId}
+        </if>
+        <if test="fileIndex != null and fileIndex != ''">
+            AND a.file_index != #{fileIndex}
+        </if>
+        <if test="type != null and type != ''">
+            AND a.type = #{type}
+        </if>
+        ORDER BY b.similarity DESC
+    </select>
+
+</mapper>

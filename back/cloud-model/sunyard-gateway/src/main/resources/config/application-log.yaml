@@ -1,0 +1,44 @@
+#个性化调整日志输出内容用以覆盖logback 配置####################
+logging:
+  config: classpath:config/logback-spring.xml
+  level:
+    org.springframework: error
+    org.springframework.boot.web.embedded.tomcat: info
+    org.springframework.context: error
+    #打印暴露的请求路由日志
+    _org.springframework.web.servlet.HandlerMapping: error #打印暴露的请求路由日志
+    org.apache: error
+    org.hibernate.validator.internal: error
+    io.netty: error
+    sun.net.www.protocol.http.HttpURLConnection: error
+    com.netflix.config.sources: error
+    #alibaba################
+    com.alibaba.spring: error
+    com.alibaba.spring.util.BeanRegistrar: error
+    #nacos--控制台打印yaml信息------------
+    com.alibaba.cloud.nacos.client.NacosPropertySourceBuilder: error
+    #nacos-client-------心跳
+    com.alibaba.nacos.client: error
+    com.alibaba.nacos.common: error
+    com.alibaba.nacos.shaded: error
+    com.alibaba.nacos.plugin: error
+    com.alibaba.cloud.nacos: error
+    #other
+    unknown.jul.logger: error
+    org.reflections.Reflections: error
+    #tlog
+    com.yomahub.tlog: error
+    #spring boot admin 日志
+    reactor.netty: error
+    de.codecentric.boot.admin: error
+    freemarker.cache: error
+    org.thymeleaf: error
+    #openFegin
+    feign.template.Template: error
+    #连接池
+    com.zaxxer.hikari: error
+  file:
+    path: /home/logs/sunyard/
+    name: ${logging.file.path}${spring.application.name}_all.log
+tlog:
+  pattern: "$preApp-->$preIp-->$traceId-->$spanId"

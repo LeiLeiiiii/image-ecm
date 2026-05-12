@@ -1,0 +1,13 @@
+auth:
+  session-id-expire: 1800
+  password-check: true
+  expire-day: 30
+  user-init-password: 'abc@123456'
+  verify-code:
+    enable: true
+    # gif  circle shear line
+    type: line
+  oauth2:
+    client-id: clientId
+    client-secret: clientSecret
+    api-token-time-out: 30000

@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.sunyard.framework.redis.config.CacheAutoConfiguration,\
+  com.sunyard.framework.redis.config.RedisAutoConfiguration,\
+  com.sunyard.framework.redis.config.RedisListenerConfig

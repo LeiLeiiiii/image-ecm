@@ -1,0 +1,1 @@
+INSERT INTO `dev_sunyard_system`.`sys_param`(`id`, `name`, `value`, `type`, `remark`, `system_code`, `status`, `create_time`, `update_time`, `is_deleted`) VALUES (111, 'AFM_PARAM_SYSTEM', '{\"FILE_SIMILARITY_SYSTEM\":0.65,\"FILE_NUM_SYSTEM\":5}', 0, NULL, NULL, NULL, '2024-04-16 17:46:35', '2024-05-07 14:05:46', 0);

@@ -1,0 +1,13 @@
+sunyard:
+  #核心线程数3：线程池创建时候初始化的线程数
+  corePoolSize: 20
+  #最大线程数4
+  maxPoolSize: 25
+  #缓冲队列200
+  queueCapacity: 200
+  #允许线程的空闲时间60秒
+  keepAliveSeconds: 60
+  #线程池名的前缀
+  threadNamePrefix: "taskExecutor-"
+  #设置线程池中任务的等待时间
+  awaitTerminationSeconds: 600

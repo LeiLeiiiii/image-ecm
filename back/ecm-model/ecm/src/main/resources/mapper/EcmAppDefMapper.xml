@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmAppDefMapper">
+    <select id="selectLastList" resultType="com.sunyard.ecm.vo.EcmBusiStorageListVO">
+        SELECT
+            a.*
+        FROM ecm_app_def  a
+            LEFT JOIN ecm_app_def AS b ON a.app_code = b.parent
+        WHERE
+            b.parent IS NULL
+    </select>
+
+    <!--  todo 无需适配-->
+    <select id="selectLastList" resultType="com.sunyard.ecm.vo.EcmBusiStorageListVO" databaseId="oracle">
+        SELECT
+            a.*
+        FROM ecm_app_def a
+            LEFT JOIN ecm_app_def b ON a.app_code = b.parent
+        WHERE
+            b.parent IS NULL
+    </select>
+</mapper>

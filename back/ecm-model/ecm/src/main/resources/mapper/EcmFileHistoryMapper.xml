@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmFileHistoryMapper">
+    <!--TODO 代码可以实现-->
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into
+        ecm_file_history
+        (id,busi_id,file_id,new_file_id,new_file_size,file_operation,create_user,create_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.busiId},#{item.fileId},#{item.newFileId},#{item.newFileSize},
+            #{item.fileOperation},#{item.createUser},#{item.createTime})
+        </foreach>
+    </insert>
+    <delete id="deleteBatchByFileId" parameterType="java.util.Collection">
+        delete from ecm_file_history
+        where file_id in
+        <foreach collection="coll" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+    <!--TODO 代码可以实现-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertBatch" parameterType="java.util.List" databaseId="oracle">
+        insert into
+        ecm_file_history
+        (id,busi_id,file_id,new_file_id,new_file_size,file_operation,create_user,create_time)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (SELECT
+            #{item.id},#{item.busiId},#{item.fileId},#{item.newFileId},#{item.newFileSize},
+            #{item.fileOperation},#{item.createUser},#{item.createTime}
+            FROM DUAL)
+        </foreach>
+    </insert>
+</mapper>

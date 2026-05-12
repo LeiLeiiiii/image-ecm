@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsRecentlyDocumentMapper">
+    <select id="searchExtend" resultType="com.sunyard.edm.dto.DocBsRecentlyDTO">
+        SELECT
+            doc.bus_id AS docId,
+            doc.doc_name,
+            doch.house_name || '/' || t.folder_name AS docUrl,
+            doc.doc_suffix,
+            doc.doc_type AS docLibraryType,
+            doc.parent_id AS lastFolderId,
+            r.update_time,
+            CASE WHEN doc.recycle_status = 1 THEN 0 ELSE 1 END AS isRecovery,
+            CASE WHEN doc.doc_status = 3 THEN 0 ELSE 1 END AS isNoSelf,
+            CASE WHEN u.doc_id IS NULL THEN 1 ELSE 0 END AS isAsh
+        FROM
+            (SELECT
+                doc_id,
+                update_time
+            FROM (
+                SELECT
+                    doc_id,
+                    update_time
+                FROM doc_bs_recently_document
+                WHERE
+                    is_deleted = 0
+                    AND user_id = #{userId}
+                ORDER BY update_time DESC
+            )
+            WHERE ROWNUM &lt;= 10
+            ) r
+            LEFT JOIN doc_bs_document doc ON doc.bus_id = r.doc_id
+            LEFT JOIN doc_sys_house doch ON doch.house_id = doc.house_id
+            LEFT JOIN
+                (SELECT
+                    t.doc_id AS folder_id,
+                    LISTAGG(d.doc_name, '/') WITHIN GROUP (ORDER BY d.folder_level) AS folder_name
+                FROM doc_bs_document_tree t
+                    LEFT JOIN doc_bs_document d ON d.bus_id = t.father_id
+                WHERE
+                    doc_id IN
+                    <foreach collection="docIdList" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                GROUP BY t.doc_id
+            ) t ON t.folder_id = doc.folder_id
+            LEFT JOIN
+                (SELECT
+                    DISTINCT doc_id
+                FROM doc_bs_document_user
+                WHERE
+                    is_deleted = 0
+                    AND rel_id IN
+                    <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+            ) u ON u.doc_id = doc.bus_id
+        ORDER BY update_time DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocSysTagMapper">
+
+    <select id="searchTagTree" resultType="com.sunyard.edm.dto.DocSysTagDTO">
+        SELECT
+            a.*
+        FROM doc_sys_tag a,
+            (SELECT
+                b.tag_id
+            FROM doc_sys_tag b
+            WHERE
+                b.is_deleted=0
+                <if test="null != parentId and '' != parentId">
+                    AND (b.parent_id=#{parentId} OR b.tag_id=#{parentId})
+                </if>
+            GROUP BY b.tag_id
+            ) c
+        WHERE
+            a.tag_level=0
+            AND a.tag_id=c.tag_id
+    </select>
+
+</mapper>

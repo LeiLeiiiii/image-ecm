@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sunyard.cloud</groupId>
+        <artifactId>sunyard-module-storage</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+    </parent>
+    <artifactId>sunyard-module-cache</artifactId>
+
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!--  连接缓存磁盘服务器位置工具      -->
+        <dependency>
+            <groupId>ch.ethz.ganymed</groupId>
+            <artifactId>ganymed-ssh2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-video</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-spire</artifactId>
+        </dependency>
+        <!--   字典表、参数配置     -->
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-module-system-api</artifactId>
+        </dependency>
+        <!-- job 相关 -->
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-starter-job</artifactId>
+        </dependency>
+        <!--     缓存所用工具类   -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-img</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-mq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-starter-redis</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

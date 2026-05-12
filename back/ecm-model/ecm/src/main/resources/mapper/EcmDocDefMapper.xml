@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmDocDefMapper">
+    <select id="selectDtdAttr" resultType="com.sunyard.ecm.dto.ecm.EcmDtdAttrDTO">
+        SELECT
+            a.attr_code,
+            a.attr_name
+        FROM ecm_dtd_attr  a
+             LEFT JOIN ecm_dtd_doc_rel  b ON b.dtd_type_id = a.dtd_type_id
+             LEFT JOIN ecm_doc_def  c ON c.doc_code = b.doc_code
+        WHERE
+            c.doc_code = #{identifyCode}
+    </select>
+
+    <select id="selectChildren" resultType="com.sunyard.ecm.po.EcmDocDef">
+        SELECT
+            c.doc_code,
+            c.doc_name,
+            c.parent,
+            c.doc_sort,
+            c.create_user,
+            c.create_time,
+            c.update_user,
+            c.update_time,
+            c.doc_type_sign,
+            c.type_sign_start,
+            c.type_sign_end,
+            c.office_limit,
+            c.img_limit,
+            c.audio_limit,
+            c.video_limit,
+            c.other_limit,
+            c.min_files,
+            c.max_files,
+            c.is_regularized,
+            c.is_obscured,
+            c.is_remade,
+            c.is_plagiarism,
+            c.is_auto_classified,
+            c.auto_classification_id,
+            c.is_parent
+        FROM ecm_doc_def  c
+        WHERE
+            NOT EXISTS(
+                        SELECT
+                            1
+                        FROM ecm_doc_def  sub
+                        WHERE
+                            sub.parent = c.doc_code
+                        )
+        <if test="isRemade != null">
+            AND c.is_remade = #{isRemade}
+        </if>
+        <if test="isRegularized != null">
+            AND c.is_regularized = #{isRegularized}
+        </if>
+        <if test="isObscured != null">
+            AND c.is_obscured = #{isObscured}
+        </if>
+        <if test="isPlagiarism != null">
+            AND c.is_plagiarism = #{isPlagiarism}
+        </if>
+        <if test="isAutoClassified != null">
+            AND c.is_auto_classified = #{isAutoClassified}
+        </if>
+    </select>
+    <!--todo 无需适配-->
+    <!-- todo 挪位置-->
+    <select id="selectDtdAttr" resultType="com.sunyard.ecm.dto.ecm.EcmDtdAttrDTO" databaseId="oracle">
+        SELECT a.attr_code,
+               a.attr_name
+        FROM ecm_dtd_attr a
+                 LEFT JOIN ecm_dtd_doc_rel b on b.dtd_type_id = a.dtd_type_id
+                 LEFT JOIN ecm_doc_def c on c.doc_code = b.doc_code
+        WHERE c.doc_code = #{identifyCode}
+    </select>
+    <!--todo 无需适配-->
+    <select id="selectChildren" resultType="com.sunyard.ecm.po.EcmDocDef" databaseId="oracle">
+        SELECT c.doc_code,
+               c.doc_name,
+               c.parent,
+               c.doc_sort,
+               c.create_user,
+               c.create_time,
+               c.update_user,
+               c.update_time,
+               c.doc_type_sign,
+               c.type_sign_start,
+               c.type_sign_end,
+               c.office_limit,
+               c.img_limit,
+               c.audio_limit,
+               c.video_limit,
+               c.other_limit,
+               c.min_files,
+               c.max_files,
+               c.is_regularized,
+               c.is_obscured,
+               c.is_remade,
+               c.is_plagiarism,
+               c.is_auto_classified,
+               c.auto_classification_id,
+               c.is_parent
+        FROM ecm_doc_def  c
+        WHERE NOT EXISTS(SELECT 1 FROM ecm_doc_def  sub WHERE sub.parent = c.doc_code)
+        <if test="isRemade != null">
+            AND c.is_remade = #{isRemade}
+        </if>
+        <if test="isRegularized != null">
+            AND c.is_regularized = #{isRegularized}
+        </if>
+        <if test="isObscured != null">
+            AND c.is_obscured = #{isObscured}
+        </if>
+        <if test="isPlagiarism != null">
+            AND c.is_plagiarism = #{isPlagiarism}
+        </if>
+        <if test="isAutoClassified != null">
+            AND c.is_auto_classified = #{isAutoClassified}
+        </if>
+    </select>
+</mapper>

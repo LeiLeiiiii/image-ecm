@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsDocumentUserMapper">
+
+    <select id="selectListExtend" resultType="com.sunyard.edm.dto.DocBsDocumentUserDTO">
+        SELECT
+            DISTINCT a.*,
+            d.team_name AS teamIdStr
+        FROM doc_bs_document_user  a
+            LEFT JOIN doc_bs_document  b ON a.doc_id = b.bus_id
+            LEFT JOIN doc_sys_team  d on a.rel_id = d.team_id
+        WHERE
+            a.doc_id = #{docId}
+            AND a.is_deleted = #{isDeleted}
+    </select>
+
+</mapper>

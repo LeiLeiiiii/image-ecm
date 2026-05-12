@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsShapeMapper">
+
+
+    <select id="queryToMe" resultType="com.sunyard.edm.dto.DocBsShapeToMeDTO">
+        SELECT
+            s.shape_id,
+            s.shape_user_id,
+            s.doc_id,
+            d.doc_name,
+            d.doc_size,
+            d.doc_suffix,
+            d.type,
+            s.shape_time,
+            s.invalid_time,
+            CASE WHEN s.invalid_time > SYSDATE THEN 0 ELSE 1 END AS shape_state,
+            CASE WHEN s.invalid_time > SYSDATE THEN 1 ELSE 0 END AS isAsh,
+            CASE WHEN d.recycle_status = 1 THEN 0 ELSE 1 END AS isRecovery,
+            CASE WHEN d.doc_status = 3 THEN 0 ELSE 1 END AS isNoSelf
+        FROM doc_bs_shape s
+            LEFT JOIN doc_bs_document d ON d.bus_id = s.doc_id
+        <if test="list != null and list.size() != 0">
+            JOIN (
+                SELECT doc_id
+                FROM doc_bs_tag_document
+                WHERE
+                    tag_id IN
+                    <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+            ) t ON t.doc_id = s.doc_id
+        </if>
+        WHERE
+            d.is_deleted = 0
+            <if test="docName != null and docName != ''">
+                AND d.doc_name LIKE '%' || #{docName} || '%'
+            </if>
+            <!--<if test="sharer != null and sharer != ''">
+                AND u.name LIKE '%' || #{sharer} || '%'
+            </if>-->
+            <if test="userIds != null and userIds.size() > 0">
+                AND s.shape_user_id IN
+                <foreach collection="userIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="shapeTimeTo != null and shapeTimeDo != null">
+                AND s.shape_time BETWEEN #{shapeTimeTo} AND #{shapeTimeDo}
+            </if>
+            <if test="shapeState != null and  shapeState == 0">
+                AND s.invalid_time &gt;= #{date}
+            </if>
+            <if test="shapeState != null and  shapeState == 1">
+                AND s.invalid_time &lt; #{date}
+            </if>
+            <if test="shapeIdList != null and shapeIdList.size() > 0">
+                AND s.shape_id IN
+                <foreach collection="shapeIdList" item="shapeId" open="(" close=")" separator=",">
+                    #{shapeId}
+                </foreach>
+            </if>
+            <choose>
+                <when test="shapeTimeSort != null and shapeTimeSort!=''">
+                    <if test="shapeTimeSort == 'ascending'">
+                        ORDER BY s.shape_time ASC
+                    </if>
+                    <if test="shapeTimeSort == 'descending'">
+                        ORDER BY s.shape_time DESC
+                    </if>
+                </when>
+                <when test="invalidTimeSort!=null and invalidTimeSort != ''">
+                    <if test="invalidTimeSort == 'ascending'">
+                        ORDER BY s.invalid_time ASC
+                    </if>
+                    <if test="invalidTimeSort == 'descending'">
+                        ORDER BY s.invalid_time DESC
+                    </if>
+                </when>
+                <otherwise>
+                    ORDER BY s.shape_time DESC
+                </otherwise>
+            </choose>
+    </select>
+
+    <select id="queryMeTo" resultType="com.sunyard.edm.dto.DocBsShapeMeToDTO">
+        SELECT
+            s.shape_id,
+            s.shape_type,
+            CASE WHEN s.shape_type = 0 THEN '内部分享' ELSE '外部分享' END AS shapeTypeStr,
+            s.doc_id,
+            d.doc_name,
+            d.doc_size,
+            d.type,
+            d.doc_suffix,
+            s.shape_time,
+            s.shape_preview,
+            s.shape_section,
+            s.invalid_time,
+            CASE WHEN s.invalid_time > SYSDATE THEN 0 ELSE 1 END AS shape_state,
+            CASE WHEN u.doc_id IS NOT NULL OR d.doc_type = 1 THEN 1 ELSE 0 END AS isAsh,
+            CASE WHEN d.recycle_status = 1 THEN 0 ELSE 1 END AS isRecovery,
+            CASE WHEN d.doc_status = 3 THEN 0 ELSE 1 END AS isNoSelf
+        FROM doc_bs_shape s
+            LEFT JOIN doc_bs_document d ON d.bus_id = s.doc_id
+            LEFT JOIN (
+                SELECT
+                    DISTINCT doc_id
+                    FROM doc_bs_document_user
+                    WHERE
+                        is_deleted = 0
+                        AND rel_id IN
+                    <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                ) u ON u.doc_id = d.bus_id
+        <if test="list != null and list.size() != 0">
+            JOIN (
+                SELECT
+                    doc_id
+                FROM doc_bs_tag_document
+                WHERE
+                    tag_id IN
+                    <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                ) t ON t.doc_id = s.doc_id
+        </if>
+        WHERE
+            d.is_deleted = 0
+            <if test="docName != null and docName != ''">
+                AND d.doc_name LIKE '%' || #{docName} || '%'
+            </if>
+            <if test="sharer != null and sharer != ''">
+                AND u.name LIKE '%' || #{sharer} || '%'
+            </if>
+            <if test="shapeTimeTo != null and shapeTimeDo != null">
+                AND s.shape_time BETWEEN #{shapeTimeTo} AND #{shapeTimeDo}
+            </if>
+            <if test="shapeState != null and  shapeState == 0">
+                AND s.invalid_time &gt;= #{date}
+            </if>
+            <if test="shapeState != null and  shapeState == 1">
+                AND s.invalid_time &lt; #{date}
+            </if>
+            <if test="shapeUserId != null">
+                AND s.shape_user_id =#{shapeUserId}
+            </if>
+            <if test="shapeType != null">
+                AND s.shape_type =#{shapeType}
+            </if>
+        <choose>
+            <when test="shapeTimeSort != null and shapeTimeSort!=''">
+                <if test="shapeTimeSort == 'ascending'">
+                    ORDER BY s.shape_time ASC
+                </if>
+                <if test="shapeTimeSort == 'descending'">
+                    ORDER BY s.shape_time DESC
+                </if>
+            </when>
+            <when test="invalidTimeSort!=null and invalidTimeSort != ''">
+                <if test="invalidTimeSort == 'ascending'">
+                    ORDER BY s.invalid_time ASC
+                </if>
+                <if test="invalidTimeSort == 'descending'">
+                    ORDER BY s.invalid_time DESC
+                </if>
+            </when>
+            <otherwise>
+                ORDER BY s.shape_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchListHome" resultType="com.sunyard.edm.dto.DocBsHomeDTO">
+        SELECT
+            s.shape_id AS id,
+            s.doc_id AS contentId,
+            d.doc_name AS content,
+            CASE WHEN s.invalid_time > SYSDATE THEN 0 ELSE 1 END AS isRead,
+            CASE WHEN d.recycle_status = 1 THEN 0 ELSE 1 END AS isRecovery,
+            CASE WHEN d.doc_status = 3 THEN 0 ELSE 1 END AS isNoSelf
+        FROM doc_bs_shape s
+            LEFT JOIN doc_bs_document d ON d.bus_id = s.doc_id
+        WHERE
+            d.is_deleted = 0
+            AND s.shape_id IN
+            <foreach collection="shapeIdList" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        ORDER BY s.shape_time DESC
+    </select>
+
+</mapper>

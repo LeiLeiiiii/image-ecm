@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sunyard.cloud</groupId>
+        <artifactId>sunyard-framework</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+    </parent>
+    <artifactId>sunyard-starter-redis</artifactId>
+
+    <name>${project.artifactId}</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.sunyard.cloud</groupId>
+            <artifactId>sunyard-common</artifactId>
+        </dependency>
+        <!--redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <!--若使用redisTemplate作为分布式锁底层-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>lock4j-redis-template-spring-boot-starter</artifactId>
+        </dependency>
+        <!--使用Resilience4j容错：熔断、重试、限时、限流、隔板-->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+    </dependencies>
+</project>

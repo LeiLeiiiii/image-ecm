@@ -1,0 +1,23 @@
+spring:
+  rabbitmq:
+    cache:
+      connection:
+        mode: channel
+      channel:
+        size: 50
+    template:
+      retry:
+        enabled: true
+        max-attempts: 5
+        initial-interval: 1s
+        multiplier: 2
+      exchange: ""
+      routing-key: "test"
+    listener:
+      type: simple
+      simple:
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          max-attempts: 2
+          initial-interval: 1s

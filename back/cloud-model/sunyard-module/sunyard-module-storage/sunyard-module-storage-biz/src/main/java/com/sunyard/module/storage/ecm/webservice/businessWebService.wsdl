@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:ns1="http://batch.mgmt.webservice.ecm.insurance.sunyard.com/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:tns="http://impl.batch.mgmt.webservice.ecm.insurance.sunyard.com/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  name="businessWebService"
+                  targetNamespace="http://impl.batch.mgmt.webservice.ecm.insurance.sunyard.com/">
+    <wsdl:import location="http://172.1.1.44:8101/SunICMS/webServices/businessWebService?wsdl=BusinessWebService.wsdl"
+                 namespace="http://batch.mgmt.webservice.ecm.insurance.sunyard.com/">
+    </wsdl:import>
+    <wsdl:message name="delBusinessResponse">
+        <wsdl:part element="ns1:delBusinessResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="modBusiness">
+        <wsdl:part element="ns1:modBusiness" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="delBusiness">
+        <wsdl:part element="ns1:delBusiness" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addBusiness">
+        <wsdl:part element="ns1:addBusiness" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="modBusinessResponse">
+        <wsdl:part element="ns1:modBusinessResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="addBusinessResponse">
+        <wsdl:part element="ns1:addBusinessResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:binding name="businessWebServiceSoapBinding" type="ns1:BusinessWebService">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="modBusiness">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="modBusiness">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="modBusinessResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="delBusiness">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="delBusiness">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="delBusinessResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addBusiness">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="addBusiness">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="addBusinessResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="businessWebService">
+        <wsdl:port binding="tns:businessWebServiceSoapBinding" name="BusinessWebServiceImplPort">
+            <soap:address location="http://172.1.1.44:8101/SunICMS/webServices/businessWebService"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

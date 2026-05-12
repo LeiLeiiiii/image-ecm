@@ -1,0 +1,54 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.1.3.212:8848
+        namespace: SunAM-DEV-XMK
+        username: nacos
+        password: nacos
+
+  servlet:
+    multipart:
+      location: /Users/raochangmei/Documents/temp
+nacos:
+  config:
+    server-addr: 172.1.3.212:8848
+    namespace: SunAM-DEV-XMK
+    username: nacos
+    password: nacos
+#
+##
+#spring:
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 127.0.0.1:8848
+#        namespace: SunAM-DEV-XMK
+#        username: nacos
+#        password: nacos
+#  servlet:
+#    multipart:
+#      location: /Users/raochangmei/Documents/temp
+#nacos:
+#  config:
+#    server-addr: 127.0.0.1:8848
+#    namespace: SunAM-DEV-XMK
+#    username: nacos
+#    password: nacos
+
+#
+#spr d: nacos
+logging:
+  level:
+    root: debug
+
+#dubbo:
+#  group: pjw
+
+    #com.alibaba.nacos.spring.util.parse.DefaultYamlConfigParse: info
+jasypt:
+  encryptor:
+    password: SunAM
+run:
+  type: local
+  name: pjw

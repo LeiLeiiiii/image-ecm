@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmDestroyTaskMapper">
+    <select id="selectDestroyList"  resultType="com.sunyard.ecm.dto.ecm.EcmDestroyTaskDTO">
+        SELECT
+        t.destroy_type,
+        t.app_code,
+        t.doc_code,
+        t.create_user_name,
+        t.create_time,
+        t.status,
+        t.audit_user_name,
+        t.destroy_time,
+        l.create_user_name AS busiCreateUserName,
+        l.create_time  AS busiCreateTime,
+        l.busi_no
+        FROM ecm_destroy_task  t
+        LEFT JOIN ecm_destroy_list  l ON t.id = l.destroy_task_id
+        <where>
+            t.status = 3 AND t.destroy_type !=3 AND t.destroy_type !=4
+            <if test="destroyTimeStart != null and destroyTimeEnd != ''">
+                AND t.destroy_time &gt;= TO_DATE(#{destroyTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                AND t.destroy_time &lt;= TO_DATE(#{destroyTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+            <if test="appCodes != null and appCodes.size() > 0 ">
+                AND t.app_code IN
+                <foreach collection="appCodes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="docCodes != null and docCodes.size() > 0 ">
+                AND t.doc_code IN
+                <foreach collection="docCodes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="destroyType != null">
+                AND t.destroy_type = #{destroyType}
+            </if>
+            <if test="busiNo != null and busiNo != ''">
+                AND l.busi_no = #{busiNo}
+            </if>
+        </where>
+        ORDER BY t.destroy_time ASC
+    </select>
+</mapper>

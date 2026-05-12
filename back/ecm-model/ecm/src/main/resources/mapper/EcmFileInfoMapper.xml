@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmFileInfoMapper">
+
+    <!--TODO 代码可以实现-->
+    <insert id="insertEcm" parameterType="java.util.List">
+        insert into
+        ecm_file_info
+        (file_id,busi_id,doc_code,mark_doc_id,new_file_id,new_file_size,new_file_name,file_md5,file_reuse,file_sort,create_user,create_time,update_user,update_time,comment,state,create_user_name,update_user_name)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.fileId},#{item.busiId},#{item.docCode},#{item.markDocId},
+            #{item.newFileId},#{item.newFileSize},#{item.newFileName},#{item.fileMd5},
+            #{item.fileReuse},#{item.fileSort},#{item.createUser},#{item.createTime},#{item.updateUser},#{item.updateTime},#{item.comment},#{item.state},#{item.createUserName},#{item.updateUserName})
+        </foreach>
+    </insert>
+
+    <!--TODO 代码可以实现-->
+    <update id="updateBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE ecm_file_info
+            SET new_file_id = #{item.fileId},
+            file_md5 = #{item.fileMd5},
+            update_user = #{item.updateUser},
+            update_user_name = #{item.updateUserName},
+            new_file_size = #{item.size},
+            update_time = #{item.updateTime}
+            WHERE file_id = #{item.oldFileId}
+        </foreach>
+
+    </update>
+
+    <select id="selectFileAndAppcode" resultType="com.sunyard.ecm.dto.ecm.EcmFileInfoDTO">
+        SELECT
+            a.*,
+            b.app_code AS appCode
+        FROM ecm_file_info  a
+            LEFT JOIN ecm_busi_info AS b ON a.busi_id = b.busi_id
+        WHERE 1=1
+        <if test="createTimeStart != null and createTimeEnd != ''">
+            AND a.create_time &gt;= #{createTimeStart}
+            AND a.create_time &lt;= #{createTimeEnd}
+        </if>
+    </select>
+
+    <delete id="deleteBatchByFileId" parameterType="java.util.Collection">
+        delete from ecm_file_info
+        where file_id in
+        <foreach collection="coll" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectWithDeleteByBusiId" parameterType="java.lang.Long" resultType="com.sunyard.ecm.po.EcmFileInfo">
+        SELECT
+            *
+        FROM ecm_file_info
+        WHERE
+            is_deleted = 1 AND
+            busi_id in
+        <foreach collection="busiId" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="searchDupMd5List" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            i.file_md5
+        FROM ecm_file_info i
+        WHERE  state ='0'
+        <if test="pdfExt != null and pdfExt != ''">
+            and i.new_file_ext = #{pdfExt}
+        </if>
+        <if test="busiIds != null and busiIds.size() > 0 ">
+            AND i.busi_id IN
+            <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY i.file_md5
+        HAVING COUNT(1) > 1
+    </select>
+    <!--TODO 代码可以实现-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertEcm" parameterType="java.util.List" databaseId="oracle">
+        insert into
+        ecm_file_info
+        (file_id,busi_id,doc_code,mark_doc_id,new_file_id,new_file_size,new_file_name,file_md5,file_reuse,file_sort,create_user,create_time,update_user,update_time,comment,state,create_user_name,update_user_name)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{item.fileId},#{item.busiId},#{item.docCode},#{item.markDocId},
+            #{item.newFileId},#{item.newFileSize},#{item.newFileName},#{item.fileMd5},
+            #{item.fileReuse},#{item.fileSort},#{item.createUser},#{item.createTime},#{item.updateUser},#{item.updateTime},#{item.comment},#{item.state},#{item.createUserName},#{item.updateUserName}
+            from dual)
+        </foreach>
+    </insert>
+    <!--TODO 代码可以实现-->
+    <update id="updateBatch" parameterType="java.util.List" databaseId="oracle">
+        <if test="list != null and list.size > 0">
+            MERGE INTO ecm_file_info target
+            USING (
+                <foreach collection="list" item="item" separator="UNION ALL">
+                    SELECT
+                        #{item.oldFileId} AS src_old_file_id,
+                        #{item.fileId} AS src_new_file_id,
+                        #{item.fileMd5} AS src_file_md5,
+                        #{item.updateUser} AS src_update_user,
+                        #{item.updateUserName} AS src_update_user_name,
+                        #{item.size} AS src_new_file_size,
+                        #{item.updateTime} AS src_update_time
+                    FROM dual
+                </foreach>
+            ) source
+            ON (target.file_id = source.src_old_file_id)
+            WHEN MATCHED THEN UPDATE SET
+                target.new_file_id = source.src_new_file_id,
+                target.file_md5 = source.src_file_md5,
+                target.update_user = source.src_update_user,
+                target.update_user_name = source.src_update_user_name,
+                target.new_file_size = source.src_new_file_size,
+                target.update_time = source.src_update_time
+        </if>
+    </update>
+    <!--TODO 无需适配-->
+<!--    <select id="selectFileAndAppcode" resultType="com.sunyard.ecm.dto.ecm.EcmFileInfoDTO" databaseId="oracle">-->
+<!--        SELECT a.*,b.app_code as appCode-->
+<!--        FROM ecm_file_info a-->
+<!--        LEFT JOIN ecm_busi_info b on a.busi_id = b.busi_id-->
+<!--        WHERE 1=1-->
+<!--        <if test="createTimeStart != null and createTimeEnd != ''">-->
+<!--            and a.create_time &gt;= #{createTimeStart}-->
+<!--            and a.create_time &lt;= #{createTimeEnd}-->
+<!--        </if>-->
+<!--    </select>-->
+    <select id="selectFileAndAppcode" resultType="com.sunyard.ecm.dto.ecm.EcmFileInfoDTO" databaseId="oracle">
+        SELECT a.*, b.app_code as appCode
+        FROM ecm_file_info a
+        LEFT JOIN ecm_busi_info b on a.busi_id = b.busi_id
+        WHERE 1=1
+        <!-- 单独判断开始时间 -->
+        <if test="createTimeStart != null and createTimeStart != ''">
+            AND a.create_time &gt;= TO_DATE(#{createTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+        </if>
+        <!-- 单独判断结束时间 -->
+        <if test="createTimeEnd != null and createTimeEnd != ''">
+            AND a.create_time &lt;= TO_DATE(#{createTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+        </if>
+    </select>
+
+    <select id="selectDocFileNums" resultType="com.sunyard.ecm.vo.DocFileNumVO">
+        select count(fileId) fileSum, docCode, docName from (
+        select f.file_id fileId,f.doc_code docCode, d.doc_name docName from ecm_file_info f
+        left join ecm_doc_def d on f.doc_code = d.doc_code where f.busi_id = #{busiId} and f.state = 0
+                                                           ) a group by  docCode, docName
+    </select>
+</mapper>

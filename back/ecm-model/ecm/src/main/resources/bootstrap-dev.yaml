@@ -1,0 +1,25 @@
+--- #################### 注册中心相关配置 ####################
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      discovery:
+        server-addr: 172.1.3.212:8848
+        namespace: cloud-dev
+        service: ${spring.application.name}
+--- #################### 配置中心相关配置 ####################
+spring:
+  cloud:
+    nacos:
+      username: nacos
+      password: nacos
+      config:
+        server-addr: 172.1.3.212:8848
+        namespace: cloud-dev
+        file-extension: yaml
+        shared-configs:
+          - data-id: base.yaml
+        extension-configs:
+          - data-id: ${spring.application.name}.yaml
+            refresh: true

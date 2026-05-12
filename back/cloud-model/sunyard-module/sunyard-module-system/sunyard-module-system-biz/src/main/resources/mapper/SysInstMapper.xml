@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysInstMapper">
+
+    <select id="searchInstTree" resultType="com.sunyard.module.system.api.dto.SysOrgDTO">
+        SELECT
+            a.* ,
+            a.inst_id AS instId
+        FROM sys_inst a,
+            (SELECT
+                 b.inst_id
+            FROM sys_inst b
+            WHERE
+                b.is_deleted=0
+            <if test="null != parentId and '' != parentId">
+                AND (b.inst_id=#{parentId} OR b.parent_id=#{parentId})
+            </if>
+            GROUP BY b.inst_id
+            ) c
+        WHERE
+            a.newlevel=0
+            AND a.inst_id=c.inst_id
+    </select>
+
+    <select id="exportList" resultType="com.sunyard.module.system.api.dto.SysInstExportDTO">
+        SELECT
+            a.name,
+            a.inst_no,
+            a.remarks,
+            b.name AS parentName
+        FROM sys_inst a
+            LEFT JOIN sys_inst b ON a.parent_id = b.inst_id AND a.is_deleted = 0
+        WHERE
+            a.newlevel = 0
+    </select>
+
+</mapper>

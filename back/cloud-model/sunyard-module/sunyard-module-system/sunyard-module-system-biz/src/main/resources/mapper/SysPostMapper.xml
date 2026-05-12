@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysPostMapper">
+
+    <select id="searchLinkedPost" resultType="com.sunyard.module.system.po.SysPost">
+        SELECT
+            a.post_id,
+            a.inst_id,
+            a.post_code,
+            a.name,
+            a.remarks,
+            a.system_code,
+            a.create_user,
+            a.update_user,
+            a.create_time,
+            a.update_time,
+            a.is_deleted
+        FROM sys_post a
+            LEFT JOIN sys_post_user b ON a.post_id = b.post_id and b.is_deleted = 0
+        WHERE
+            b.user_id = #{userId}
+            AND a.is_deleted = 0
+    </select>
+
+    <select id="searchByCondition" resultType="com.sunyard.module.system.api.dto.SysPostDTO">
+        SELECT
+            post_id,
+            inst_id,
+            post_code,
+            name,
+            remarks
+        FROM sys_post
+        WHERE
+            is_deleted = 0
+            <if test="sysPostDTO.postId != null">
+                AND post_id = #{sysPostDTO.postId}
+            </if>
+            <if test="sysPostDTO.instId != null">
+                AND inst_id = #{sysPostDTO.instId}
+            </if>
+            <if test="sysPostDTO.userId != null">
+                AND post_id in
+                    (SELECT
+                        post_id
+                    FROM sys_post_user
+                    WHERE
+                        user_id = #{sysPostDTO.userId} AND is_deleted = 0)
+            </if>
+            <if test="sysPostDTO.name != null and sysPostDTO.name != ''">
+                AND name = #{sysPostDTO.name}
+            </if>
+            <if test="sysPostDTO.postCode != null and sysPostDTO.postCode != ''">
+                AND post_code = #{sysPostDTO.postCode}
+            </if>
+    </select>
+</mapper>

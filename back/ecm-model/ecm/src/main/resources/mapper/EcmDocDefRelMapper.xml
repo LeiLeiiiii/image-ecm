@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmDocDefRelMapper">
+
+    <!-- todo 挪位置-->
+    <select id="selectAllChildrenInfo" resultType="com.sunyard.ecm.dto.ecm.EcmDocDefDTO">
+        SELECT
+            a.*,
+            b.parent AS parent
+        FROM ecm_doc_def  a
+            LEFT JOIN ecm_doc_def_rel AS b ON a.doc_code = b.doc_code
+    </select>
+
+    <!--TODO 无需适配-->
+    <!-- todo 挪位置-->
+<!--    oracle    -->
+    <select id="selectAllChildrenInfo" resultType="com.sunyard.ecm.dto.ecm.EcmDocDefDTO" databaseId="oracle">
+        SELECT a.*,
+               b.parent as parent
+        FROM ecm_doc_def a
+                 LEFT JOIN ecm_doc_def_rel b on a.doc_code = b.doc_code
+    </select>
+</mapper>

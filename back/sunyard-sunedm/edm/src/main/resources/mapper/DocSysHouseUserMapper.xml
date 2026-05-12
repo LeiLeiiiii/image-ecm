@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocSysHouseUserMapper">
+
+    <select id="selectInfo" resultType="com.sunyard.edm.dto.DocBsDocumentUserDTO">
+        SELECT
+            DISTINCT a.*,
+            d.team_name AS teamIdStr
+        FROM doc_sys_house_user  a
+            LEFT JOIN doc_sys_house  b ON a.house_id = b.house_id
+            LEFT JOIN doc_sys_team  d ON a.rel_id = d.team_id
+        WHERE
+            a.is_deleted = 0
+            AND a.house_id = #{parentId}
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+--- #################### 负载均衡 ####################
+spring:
+  cloud:
+    loadbalancer:
+      nacos:
+        enabled: true #开启nacos权重负载策略，服务权重值相同随机
+      health-check:
+        refetch-instances: true
+        refetch-instances-interval: 5s
+        repeat-health-check: false
+      retry:
+        # 该参数用来开启或关闭重试机制，默认是开启
+        enabled: true
+        # 对当前实例重试的次数，默认值: 0
+        max-retries-on-same-service-instance: 0
+        # 切换实例进行重试的次数，默认值: 1
+        max-retries-on-next-service-instance: 1
+        avoid-previous-instance: true

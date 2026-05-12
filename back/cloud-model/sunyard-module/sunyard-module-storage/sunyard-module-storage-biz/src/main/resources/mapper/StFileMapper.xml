@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.storage.mapper.StFileMapper">
+    <delete id="physicalDeleteById">
+        DELETE FROM st_file WHERE id=#{id}
+    </delete>
+
+    <select id="selectFileDTO" resultType="com.sunyard.module.storage.dto.StFileDTO">
+        SELECT
+            a.id,
+            a.original_filename,
+            a.filename,
+            a.ext,
+            a.size,
+            a.object_key,
+            a.file_source,
+            a.equipment_id,
+            a.source_file_md5,
+            a.file_md5,
+            a.create_user,
+            a.create_time,
+            a.is_encrypt,
+            a.encrypt_key,
+            a.encrypt_type,
+            a.encrypt_len,
+            CONCAT(b.storage_address,'/',b.bucket,'/',a.object_key) AS url,
+            b.bucket AS bucket_name,
+            CONCAT(b.bucket,'/',a.object_key) AS file_path
+        FROM st_file a
+            JOIN st_equipment b ON b.id = a.equipment_id AND b.is_deleted = 0
+        <where>
+            a.is_deleted = 0
+            <if test="id != null">
+                AND a.id = #{id}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+    <select id="selectFileDTOByPO" resultType="com.sunyard.module.storage.dto.StFileDTO">
+        SELECT
+            a.id,
+            a.original_filename,
+            a.filename,
+            a.ext,
+            a.size,
+            a.object_key,
+            a.file_source,
+            a.equipment_id,
+            a.source_file_md5,
+            a.file_md5,
+            a.create_user,
+            a.create_time,
+            a.is_encrypt,
+            a.encrypt_key,
+            a.encrypt_type,
+            a.encrypt_len,
+            CONCAT(b.storage_address,'/',b.bucket,'/',a.object_key) AS url,
+            b.bucket AS bucket_name,
+            CONCAT(b.bucket,'/',a.object_key) AS file_path
+        FROM st_file a
+            JOIN st_equipment b ON b.id = a.equipment_id AND b.is_deleted = 0
+        <where>
+            a.is_deleted = 0
+            <if test="id != null">
+                AND a.id = #{id}
+            </if>
+            <if test="originalFilename != null and originalFilename != ''">
+                AND original_filename = #{originalFilename}
+            </if>
+            <if test="filename != null and filename != ''">
+                AND filename = #{filename}
+            </if>
+            <if test="ext != null and ext != ''">
+                AND ext = #{ext}
+            </if>
+            <if test="size != null">
+                AND size = #{size}
+            </if>
+            <if test="objectKey != null and objectKey != ''">
+                AND object_key = #{objectKey}
+            </if>
+            <if test="fileSource != null and fileSource != ''">
+                AND file_source = #{fileSource}
+            </if>
+            <if test="equipmentId != null">
+                AND equipment_id = #{equipmentId}
+            </if>
+            <if test="sourceFileMd5 != null and sourceFileMd5 != ''">
+                AND source_file_md5 = #{sourceFileMd5}
+            </if>
+            <if test="fileMd5 != null and fileMd5 != ''">
+                AND file_md5 = #{fileMd5}
+            </if>
+            <if test="createUser != null">
+                AND create_user = #{createUser}
+            </if>
+            <if test="createTime != null">
+                AND create_time = #{createTime}
+            </if>
+            <if test="isDeleted != null">
+                AND is_deleted = #{isDeleted}
+            </if>
+            <if test="isEncrypt != null">
+                AND is_encrypt = #{isEncrypt}
+            </if>
+            <if test="encryptType != null">
+                AND encrypt_type = #{encryptType}
+            </if>
+            <if test="encryptLen != null and encryptLen != ''">
+                AND encrypt_len = #{encryptLen}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+    <select id="selectFileDTOByIds" resultType="com.sunyard.module.storage.dto.StFileDTO">
+        SELECT
+            a.id,
+            a.original_filename,
+            a.filename,
+            a.ext,
+            a.size,
+            a.object_key,
+            a.file_source,
+            a.equipment_id,
+            a.source_file_md5,
+            a.file_md5,
+            a.create_user,
+            a.create_time,
+            a.is_encrypt,
+            a.encrypt_key,
+            a.encrypt_type,
+            a.encrypt_len
+        FROM st_file a
+        <where>
+            a.is_deleted = 0
+            <if test="ids != null and ids.size() > 0">
+                AND a.id IN
+                <foreach item="id" collection="ids" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <select id="selectListByIdSourt" parameterType="java.util.List" resultType="com.sunyard.module.storage.dto.StFileDTO">
+        SELECT
+            a.id,
+            a.original_filename,
+            a.filename,
+            a.ext,
+            a.size,
+            a.object_key,
+            a.file_source,
+            a.equipment_id,
+            a.source_file_md5,
+            a.file_md5,
+            a.create_user,
+            a.create_time,
+            a.is_encrypt,
+            a.encrypt_key,
+            a.encrypt_type,
+            a.encrypt_len,
+            CONCAT(b.storage_address,'/',b.bucket,'/',a.object_key) AS url,
+            b.bucket AS bucket_name,
+            CONCAT(b.bucket,'/',a.object_key) AS file_path
+        FROM st_file a
+            JOIN st_equipment b ON b.id = a.equipment_id AND b.is_deleted = 0
+        WHERE
+            a.is_deleted = 0
+            AND a.id IN
+            <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        ORDER BY
+        FIELD(a.id ,
+        <foreach item="id" collection="fileIdList" separator=",">
+            #{id}
+        </foreach>
+        );
+    </select>
+
+    <!--======================oracle=============================-->
+    <!--======================oracle=============================-->
+
+    <!-- 1. selectFileDTO for Oracle (修复保留字 SIZE 等问题) -->
+    <select id="selectFileDTO" resultType="com.sunyard.module.storage.dto.StFileDTO" databaseId="oracle">
+        SELECT
+        a."ID",
+        a."ORIGINAL_FILENAME",
+        a."FILENAME",
+        a."EXT",
+        a."SIZE",
+        a."OBJECT_KEY",
+        a."FILE_SOURCE",
+        a."EQUIPMENT_ID",
+        a."SOURCE_FILE_MD5",
+        a."FILE_MD5",
+        a."CREATE_USER",
+        a."CREATE_TIME",
+        a."IS_ENCRYPT",
+        a."ENCRYPT_KEY",
+        a."ENCRYPT_TYPE",
+        a."ENCRYPT_LEN",
+        (b."STORAGE_ADDRESS" || '/' || b."BUCKET" || '/' || a."OBJECT_KEY") AS url,
+        b."BUCKET" AS bucket_name,
+        (b."BUCKET" || '/' || a."OBJECT_KEY") AS file_path
+        FROM st_file a
+        JOIN st_equipment b ON b."ID" = a."EQUIPMENT_ID" AND b."IS_DELETED" = 0
+        <where>
+            a."IS_DELETED" = 0
+            <if test="id != null">
+                AND a."ID" = #{id}
+            </if>
+        </where>
+        ORDER BY a."CREATE_TIME" DESC
+    </select>
+
+    <!-- 2. selectFileDTOByPO for Oracle (同样修复) -->
+    <select id="selectFileDTOByPO" resultType="com.sunyard.module.storage.dto.StFileDTO" databaseId="oracle">
+        SELECT
+        a."ID", a."ORIGINAL_FILENAME", a."FILENAME", a."EXT", a."SIZE", a."OBJECT_KEY",
+        a."FILE_SOURCE", a."EQUIPMENT_ID", a."SOURCE_FILE_MD5", a."FILE_MD5",
+        a."CREATE_USER", a."CREATE_TIME", a."IS_ENCRYPT", a."ENCRYPT_KEY",
+        a."ENCRYPT_TYPE", a."ENCRYPT_LEN",
+        (b."STORAGE_ADDRESS" || '/' || b."BUCKET" || '/' || a."OBJECT_KEY") AS url,
+        b."BUCKET" AS bucket_name,
+        (b."BUCKET" || '/' || a."OBJECT_KEY") AS file_path
+        FROM st_file a
+        JOIN st_equipment b ON b."ID" = a."EQUIPMENT_ID" AND b."IS_DELETED" = 0
+        <where>
+            a."IS_DELETED" = 0
+            <if test="id != null">AND a."ID" = #{id}</if>
+            <if test="originalFilename != null and originalFilename != ''">AND a."ORIGINAL_FILENAME" = #{originalFilename}</if>
+            <if test="filename != null and filename != ''">AND a."FILENAME" = #{filename}</if>
+            <if test="ext != null and ext != ''">AND a."EXT" = #{ext}</if>
+            <if test="size != null">AND a."SIZE" = #{size}</if>
+            <if test="objectKey != null and objectKey != ''">AND a."OBJECT_KEY" = #{objectKey}</if>
+            <if test="fileSource != null and fileSource != ''">AND a."FILE_SOURCE" = #{fileSource}</if>
+            <if test="equipmentId != null">AND a."EQUIPMENT_ID" = #{equipmentId}</if>
+            <if test="sourceFileMd5 != null and sourceFileMd5 != ''">AND a."SOURCE_FILE_MD5" = #{sourceFileMd5}</if>
+            <if test="fileMd5 != null and fileMd5 != ''">AND a."FILE_MD5" = #{fileMd5}</if>
+            <if test="createUser != null">AND a."CREATE_USER" = #{createUser}</if>
+            <if test="createTime != null">AND a."CREATE_TIME" = #{createTime}</if>
+            <if test="isDeleted != null">AND a."IS_DELETED" = #{isDeleted}</if>
+            <if test="isEncrypt != null">AND a."IS_ENCRYPT" = #{isEncrypt}</if>
+            <if test="encryptType != null">AND a."ENCRYPT_TYPE" = #{encryptType}</if>
+            <if test="encryptLen != null and encryptLen != ''">AND a."ENCRYPT_LEN" = #{encryptLen}</if>
+        </where>
+        ORDER BY a."CREATE_TIME" DESC
+    </select>
+
+    <!-- 3. selectFileDTOByIds for Oracle -->
+    <select id="selectFileDTOByIds" resultType="com.sunyard.module.storage.dto.StFileDTO" databaseId="oracle">
+        SELECT a."ID", a."ORIGINAL_FILENAME", a."FILENAME", a."EXT", a."SIZE", a."OBJECT_KEY",
+        a."FILE_SOURCE", a."EQUIPMENT_ID", a."SOURCE_FILE_MD5", a."FILE_MD5",
+        a."CREATE_USER", a."CREATE_TIME", a."IS_ENCRYPT", a."ENCRYPT_KEY",
+        a."ENCRYPT_TYPE", a."ENCRYPT_LEN"
+        FROM st_file a
+        <where>
+            a."IS_DELETED" = 0
+            <if test="ids != null and ids.size() > 0">
+                AND a."ID" IN
+                <foreach item="id" collection="ids" open="(" separator="," close=")">#{id}</foreach>
+            </if>
+        </where>
+        ORDER BY a."CREATE_TIME" DESC
+    </select>
+
+    <select id="selectFileDTOByIds1" resultType="com.sunyard.module.storage.dto.StFileDTO" databaseId="oracle">
+        SELECT a."ID", a."ORIGINAL_FILENAME", a."FILENAME", a."EXT", a."SIZE", a."OBJECT_KEY",
+        a."FILE_SOURCE", a."EQUIPMENT_ID", a."SOURCE_FILE_MD5", a."FILE_MD5",
+        a."CREATE_USER", a."CREATE_TIME", a."IS_ENCRYPT", a."ENCRYPT_KEY",
+        a."ENCRYPT_TYPE", a."ENCRYPT_LEN"
+        FROM st_file a
+        <where>
+            a."IS_DELETED" = 0
+            <if test="ids != null and ids.size() > 0">
+                AND a."ID" IN
+                <foreach item="id" collection="ids" open="(" separator="," close=")">#{id}</foreach>
+            </if>
+        </where>
+    </select>
+    <!-- 4. selectListByIdSourt for Oracle -->
+<!--    <select id="selectListByIdSourt" parameterType="java.util.List" resultType="com.sunyard.module.storage.dto.StFileDTO" databaseId="oracle">-->
+<!--        SELECT a."ID", a."ORIGINAL_FILENAME", a."FILENAME", a."EXT", a."SIZE", a."OBJECT_KEY",-->
+<!--        a."FILE_SOURCE", a."EQUIPMENT_ID", a."SOURCE_FILE_MD5", a."FILE_MD5",-->
+<!--        a."CREATE_USER", a."CREATE_TIME", a."IS_ENCRYPT", a."ENCRYPT_KEY",-->
+<!--        a."ENCRYPT_TYPE", a."ENCRYPT_LEN",-->
+<!--        (b."STORAGE_ADDRESS" || '/' || b."BUCKET" || '/' || a."OBJECT_KEY") AS url,-->
+<!--        b."BUCKET" AS bucket_name,-->
+<!--        (b."BUCKET" || '/' || a."OBJECT_KEY") AS file_path-->
+<!--        FROM st_file a-->
+<!--        JOIN st_equipment b ON b."ID" = a."EQUIPMENT_ID" AND b."IS_DELETED" = 0-->
+<!--        WHERE a."IS_DELETED" = 0 AND a."ID" IN-->
+<!--        <foreach item="id" collection="fileIdList" open="(" separator="," close=")">#{id}</foreach>-->
+<!--        ORDER BY INSTR(-->
+<!--        <foreach item="id" collection="fileIdList" separator="||','||" open="''" close="''">#{id}</foreach>,-->
+<!--        ',' || TO_CHAR(a."ID") || ','-->
+<!--        )-->
+<!--    </select>-->
+    <!-- 4. selectListByIdSourt for Oracle -->
+    <select id="selectListByIdSourt" resultType="com.sunyard.module.storage.dto.StFileDTO" databaseId="oracle">
+        SELECT a."ID", a."ORIGINAL_FILENAME", a."FILENAME", a."EXT", a."SIZE", a."OBJECT_KEY",
+        a."FILE_SOURCE", a."EQUIPMENT_ID", a."SOURCE_FILE_MD5", a."FILE_MD5",
+        a."CREATE_USER", a."CREATE_TIME", a."IS_ENCRYPT", a."ENCRYPT_KEY",
+        a."ENCRYPT_TYPE", a."ENCRYPT_LEN",
+        (b."STORAGE_ADDRESS" || '/' || b."BUCKET" || '/' || a."OBJECT_KEY") AS url,
+        b."BUCKET" AS bucket_name,
+        (b."BUCKET" || '/' || a."OBJECT_KEY") AS file_path
+        FROM st_file a
+        JOIN st_equipment b ON b."ID" = a."EQUIPMENT_ID" AND b."IS_DELETED" = 0
+        WHERE a."IS_DELETED" = 0
+        <!-- IN 子句保持不变，这是正确的 -->
+        AND a."ID" IN
+        <foreach item="id" collection="fileIdList" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY
+        <!-- ✅ 修正这里：直接使用参数字符串，不要 foreach -->
+        INSTR(#{orderStr}, ',' || TO_CHAR(a."ID") || ',')
+    </select>
+</mapper>

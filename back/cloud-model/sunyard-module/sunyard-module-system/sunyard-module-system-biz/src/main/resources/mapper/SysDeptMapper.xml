@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysDeptMapper">
+
+    <select id="searchDeptTree" resultType="com.sunyard.module.system.api.dto.SysOrgDTO">
+        SELECT
+            a.*
+        FROM sys_dept a,
+            (SELECT
+                 b.dept_id
+            FROM sys_dept b
+            WHERE
+                b.is_deleted=0
+            <if test="null != parentId and '' != parentId">
+                AND (b.parent_id=#{parentId} OR b.dept_id=#{parentId})
+            </if>
+            GROUP BY b.dept_id
+            ) c
+        WHERE
+            a.newlevel=0
+            AND a.dept_id=c.dept_id
+    </select>
+
+    <select id="exportListByInstId" resultType="com.sunyard.module.system.api.dto.SysDeptExportDTO">
+        SELECT
+            a.name,
+            a.dept_no,
+            b.name AS parent_name
+        FROM sys_dept a
+            LEFT JOIN sys_dept b ON a.parent_id = b.dept_id
+        WHERE
+            a.dept_id IN (
+                        SELECT
+                            dept_id
+                        FROM sys_dept
+                        WHERE
+                            parent_id = #{parentId}
+                        )
+            AND a.newlevel = 0
+    </select>
+
+    <select id="selectAllFather" resultType="com.sunyard.module.system.po.SysDept">
+        WITH RECURSIVE t AS (
+                            SELECT
+                                *
+                            FROM sys_dept
+                            WHERE
+                                dept_id = #{folderDept}
+                            UNION ALL
+                            SELECT
+                                a.*
+                            FROM sys_dept a
+                                JOIN t ON a.dept_id = t.parent_id AND a.is_deleted = 0
+                            )
+        SELECT *
+        FROM t
+    </select>
+
+</mapper>

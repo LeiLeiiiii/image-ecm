@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysLogMapper">
+    <select id="search" resultType="com.sunyard.module.system.api.dto.SysLogDTO">
+        SELECT
+            c.*,
+            d.name AS userName
+        FROM (
+            SELECT
+                 a.*
+            FROM sys_log a
+                INNER JOIN (
+                            SELECT
+                                a.id
+                            FROM sys_log a
+                            <if test="null != log.userName and '' != log.userName">
+                                LEFT JOIN sys_user e ON a.user_id = e.user_id
+                            </if>
+                            WHERE
+                                a.is_deleted = 0
+                            <if test="null != log.id and '' != log.id">
+                                AND a.id = #{log.id}
+                            </if>
+                            <if test="null != log.requestDesc and '' != log.requestDesc">
+                                AND a.request_desc LIKE '%' || #{log.requestDesc} || '%'
+                            </if>
+                            <if test="null != log.responseCode and '' != log.responseCode or 0 == log.responseCode">
+                                AND a.response_code = #{log.responseCode}
+                            </if>
+                            <if test="null != log.userName and '' != log.userName">
+                                AND e.name LIKE '%' || #{log.userName} || '%'
+                            </if>
+                            <if test="null != log.requestIp and '' != log.requestIp">
+                                AND a.request_ip LIKE '%' || #{log.requestIp} || '%'
+                            </if>
+                            <if test="null != log.logsStartDate and null != log.logsEndDate">
+                                AND a.create_time BETWEEN #{log.logsStartDate} AND #{log.logsEndDate}
+                            </if>
+                            <if test="null != log.logSystem and '' != log.logSystem">
+                                AND a.log_system = #{log.logSystem}
+                            </if>
+                            ORDER BY a.id DESC
+                            ) b ON a.id = b.id
+                ) c
+            LEFT JOIN sys_user d ON c.user_id = d.user_id
+    </select>
+    <select id="selectCounts" resultType="Long">
+        SELECT
+            count(*)
+        FROM sys_log a
+        <if test="null != log.userName and '' != log.userName">
+            LEFT JOIN sys_user e ON a.user_id = e.user_id
+        </if>
+        WHERE
+            a.is_deleted = 0
+        <if test="null != log.id and '' != log.id">
+            AND a.id = #{log.id}
+        </if>
+        <if test="null != log.requestDesc and '' != log.requestDesc">
+            AND a.request_desc LIKE '%' || #{log.requestDesc} || '%'
+        </if>
+        <if test="null != log.responseCode and '' != log.responseCode or 0 == log.responseCode">
+            AND a.response_code =#{log.responseCode}
+        </if>
+        <if test="null != log.userName and '' != log.userName">
+            AND e.name LIKE '%' || #{log.userName} || '%'
+        </if>
+        <if test="null != log.logsStartDate and null != log.logsEndDate">
+            AND a.create_time BETWEEN #{log.logsStartDate} AND #{log.logsEndDate}
+        </if>
+        <if test="null != log.logSystem and '' != log.logSystem">
+            AND a.log_system BETWEEN #{log.logSystem} AND #{log.logSystem}
+        </if>
+    </select>
+    <select id="search2" resultType="com.sunyard.module.system.api.dto.SysLogDTO">
+        SELECT
+            a.id,
+            a.user_id,
+            a.request_ip,
+            a.request_url,
+            a.request_desc,
+            a.request_params,
+            a.elapsed_time,
+            a.response_code,
+            a.exception_msg,
+            a.create_time,
+            a.update_time,
+            a.is_deleted,
+            b.name AS user_name
+        FROM sys_log a
+            LEFT JOIN sys_user b ON a.user_id=b.user_id
+        WHERE
+            1=1
+        <if test="null != log.id and '' != log.id">
+            AND a.id = #{log.id}
+        </if>
+        <if test="null != log.userName and '' != log.userName">
+            AND b.name LIKE '%' || #{log.userName} || '%'
+        </if>
+        <if test="null != log.requestDesc and '' != log.requestDesc">
+            AND a.request_desc LIKE '%' || #{log.requestDesc} || '%'
+        </if>
+        <if test="null != log.responseCode and '' != log.responseCode or 0 == log.responseCode">
+            AND a.response_code =#{log.responseCode}
+        </if>
+        <if test="null != log.logsStartDate and null != log.logsEndDate">
+            AND a.create_time BETWEEN #{log.logsStartDate} AND #{log.logsEndDate}
+        </if>
+        ORDER BY a.create_time DESC
+    </select>
+    <select id="searchList" resultType="com.sunyard.module.system.api.dto.SysLogDTO">
+        SELECT
+            a.*,
+            b.name AS user_name
+        FROM sys_log a
+            LEFT JOIN sys_user b ON a.user_id = b.user_id
+        WHERE
+        1=1
+        <if test="null != log.id and '' != log.id">
+            AND a.id = #{log.id}
+        </if>
+        <if test="null != log.requestUrl and '' != log.requestUrl">
+            AND a.request_url = #{log.requestUrl}
+        </if>
+        <if test="null != log.instId and '' != log.instId">
+            AND b.inst_id = #{log.instId}
+        </if>
+        <if test="null != log.responseCode and '' != log.responseCode">
+            AND a.response_code = #{log.responseCode}
+        </if>
+        <if test="null != log.logSystem and '' != log.logSystem">
+            AND a.log_system = #{log.logSystem}
+        </if>
+        <if test="null != log.logsStartDate and null != log.logsEndDate">
+            AND a.create_time BETWEEN #{log.logsStartDate} AND #{log.logsEndDate}
+        </if>
+            AND a.is_deleted = 0
+    </select>
+    <select id="searchListByIds" resultType="com.sunyard.module.system.api.dto.SysLogDTO">
+        SELECT
+            a.*,
+            b.name AS user_name
+        FROM sys_log a
+            LEFT JOIN sys_user b ON a.user_id = b.user_id
+        WHERE
+            1=1
+        <if test="ids != null and ids.length > 0">
+            AND a.id IN
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+            AND a.is_deleted = 0
+        ORDER BY a.create_time DESC
+    </select>
+    <select id="searchByParams" resultType="com.sunyard.module.system.api.dto.SysLogDTO">
+        SELECT
+            l.request_params COUNT(l.request_params) AS num
+        FROM sys_log l
+        WHERE
+            1=1
+        <!-- 用户ID IN 查询 -->
+        <if test="userIds != null and !userIds.isEmpty()">
+            AND l.user_id IN
+            <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="null != logsStartDate and null != logsEndDate">
+            AND l.create_time BETWEEN #{logsStartDate} AND #{logsEndDate}
+        </if>
+            AND (l.request_desc = '档案检索' OR l.request_desc = '检索查看' )
+        <!-- GROUP BY 分组 -->
+        <if test="groupStr != null and groupStr != ''">
+        GROUP BY l.request_params
+        </if>
+    </select>
+    <select id="countByDesc" resultType="com.sunyard.module.system.api.dto.SysLogDTO">
+        SELECT
+            l.request_desc, COUNT(l.request_desc) AS num
+        FROM sys_log l
+        WHERE
+            1=1
+        <!-- 用户ID IN 查询 -->
+        <if test="userIds != null and !userIds.isEmpty()">
+            AND l.user_id IN
+            <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+        <if test="null != logsStartDate and null != logsEndDate">
+            AND a.create_time BETWEEN #{logsStartDate} AND #{logsEndDate}
+        </if>
+            AND (l.request_desc = '档案检索' OR l.request_desc = '检索查看')
+        <!-- GROUP BY 分组 -->
+        <if test="groupStr != null and groupStr != ''">
+        GROUP BY l.request_desc
+        </if>
+    </select>
+</mapper>

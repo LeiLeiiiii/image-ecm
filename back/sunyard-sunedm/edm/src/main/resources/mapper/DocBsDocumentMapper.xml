@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsDocumentMapper">
+
+    <select id="selectListExtend" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*,
+            u.permiss_type
+        FROM doc_bs_document a
+            LEFT JOIN doc_bs_tag_document e ON a.bus_id = e.doc_id
+            LEFT JOIN doc_bs_doc_rel d ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_document c ON c.rel_doc = a.bus_id
+            LEFT JOIN doc_bs_document_user u ON a.bus_id = u.doc_id
+        <include refid="selectListExtendSql"/>
+    </select>
+    <sql id="selectListExtendSql">
+        <where>
+            <if test="extendPageDTO.attchName != null and extendPageDTO.attchName != ''">
+                and c.doc_name like '%' || #{extendPageDTO.attchName} || '%'
+                and c.type = #{extendPageDTO.file}
+            </if>
+            <if test="extendPageDTO.createStartDate != null">
+                and a.create_time between #{extendPageDTO.createStartDate} and #{extendPageDTO.createEndDate}
+            </if>
+            <if test="extendPageDTO.updateStartDate != null">
+                and a.update_time between #{extendPageDTO.updateStartDate} and #{extendPageDTO.updateEndDate}
+            </if>
+            <if test="extendPageDTO.docName != null and extendPageDTO.docName != ''">
+                and a.doc_name like '%' || #{extendPageDTO.docName} || '%'
+            </if>
+            <if test="extendPageDTO.folderId != null and extendPageDTO.folderId != ''">
+                and a.folder_id = #{extendPageDTO.folderId}
+            </if>
+
+            <if test="extendPageDTO.folderIds != null and extendPageDTO.folderIds.size() > 0">
+                and a.folder_id in
+                <foreach item="item" index="index" collection="extendPageDTO.folderIds"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="extendPageDTO.folderId != null and extendPageDTO.folderId != ''">
+                and a.folder_id = #{extendPageDTO.folderId}
+            </if>
+            <if test="extendPageDTO.document != null">
+                and a.type = #{extendPageDTO.document}
+            </if>
+            and a.recycle_status = #{extendPageDTO.recycleStatus}
+            and a.is_deleted = #{extendPageDTO.isDeleted}
+            <choose>
+                <when test="extendPageDTO.docType != null and extendPageDTO.docType == 1">
+                    and a.doc_owner = #{extendPageDTO.docOwner} and a.doc_type = #{extendPageDTO.docType}
+                </when>
+                <otherwise>
+                        <if test="extendPageDTO.showFlag != null and extendPageDTO.showFlag == true">
+                            <if test="extendPageDTO.relBusId != null and extendPageDTO.relBusId.size() > 0">
+                                and a.bus_id not in
+                                <foreach item="item1" index="index" collection="extendPageDTO.relBusId"
+                                         open="(" separator="," close=")">
+                                    #{item1}
+                                </foreach>
+
+                            </if>
+                            AND (
+                            <!-- 机构条件 -->
+                            (u.rel_id = #{extendPageDTO.instId}
+                            AND u.type = #{extendPageDTO.inst}
+                            AND u.permiss_type IN
+                            <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                                     close=")">
+                                #{item}
+                            </foreach>)
+                            <!-- 部门条件 -->
+                            or( u.rel_id = #{extendPageDTO.deptId}
+                            AND u.type = #{extendPageDTO.dept}
+                            AND u.permiss_type IN
+                            <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                                     close=")">
+                                #{item}
+                            </foreach>)
+                            <!-- 用户条件 -->
+                            or( u.rel_id = #{extendPageDTO.tokenId}
+                            AND u.type = #{extendPageDTO.user}
+                            AND u.permiss_type IN
+                            <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                                     close=")">
+                                #{item}
+                            </foreach>)
+                            <!-- 团队条件（动态判断） -->
+
+                            <if test="extendPageDTO.relIds != null and extendPageDTO.relBusId.size() > 0">
+                                or(
+                                u.rel_id IN
+                                <foreach collection="extendPageDTO.relIds" item="teamId" open="(" separator=","
+                                         close=")">
+                                    #{teamId}
+                                </foreach>
+                                AND u.type = #{extendPageDTO.team}
+                                AND u.permiss_type IN
+                                <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                                         close=")">
+                                    #{item}
+                                </foreach>
+                                )
+                            </if>
+
+                            )
+                        </if>
+
+                    and a.house_id = #{extendPageDTO.houseId}
+                    and a.doc_type =#{extendPageDTO.docType}
+                    <if test="extendPageDTO.tagId != null">
+                        and e.tag_id = #{extendPageDTO.tagId}
+                    </if>
+                    <!--<if test="extendPageDTO.docOwnerStr != null">
+                        and f.name like '%' || #{extendPageDTO.docOwnerStr} || '%'
+                    </if>-->
+                    <if test="extendPageDTO.userIds != null and extendPageDTO.userIds.size() > 0">
+                        AND a.doc_owner IN
+                        <foreach collection="extendPageDTO.userIds" item="item" open="(" separator="," close=")">
+                            #{item}
+                        </foreach>
+                    </if>
+                    and a.type = 1 and a.doc_status in(0,1,3)
+                </otherwise>
+            </choose>
+        </where>
+        order by a.type asc
+    </sql>
+
+    <sql id="selectDocBsDocuments">
+        WHERE
+            a.type = 0
+            AND a.recycle_status = 0
+            AND u.is_deleted = 0
+            AND a.doc_type = 0
+            AND a.house_id = #{houseId}
+            AND (
+                (u.rel_id = #{relId1} AND u.type = #{type1})
+                OR (u.rel_id = #{relId2} AND u.type = #{type2})
+                OR (u.rel_id = #{relId3} AND u.type = #{type3})
+                <if test="teams != null and teams.size() > 0">
+                    OR (u.rel_id IN
+                    <foreach collection="teams" item="team" open="(" separator="," close=")">
+                        #{team}
+                    </foreach>
+                    AND u.type = #{type4})
+                </if>
+                )
+    </sql>
+
+    <select id="selectDocBsDocumentList" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*,
+            u.permiss_type
+        FROM doc_bs_document a
+            LEFT JOIN doc_bs_tag_document e ON a.bus_id = e.doc_id
+            LEFT JOIN doc_bs_doc_rel d ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_document c ON c.rel_doc = a.bus_id
+            LEFT JOIN doc_bs_document_user u ON a.bus_id = u.doc_id
+        <include refid="selectDocBsDocuments"/>
+    </select>
+
+    <select id="selectDocBsDocumentListSort" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*,
+            u.permiss_type
+        FROM doc_bs_document a
+            LEFT JOIN doc_bs_tag_document e ON a.bus_id = e.doc_id
+            LEFT JOIN doc_bs_doc_rel d ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_document c ON c.rel_doc = a.bus_id
+            LEFT JOIN doc_bs_document_user u ON a.bus_id = u.doc_id
+        <include refid="selectDocBsDocuments"/>
+        ORDER BY a.doc_seq ASC ,a.create_time DESC
+    </select>
+
+    <select id="selectListByRecycle" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT d.del_date,
+            d.recycle_id,
+            a.*
+        FROM doc_bs_recycle d
+            LEFT JOIN doc_bs_document a ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_tag_document c ON d.doc_id = c.doc_id
+        <include refid="selectDocBsDocumentSql"/>
+    </select>
+    <sql id="selectDocBsDocumentSql">
+        where d.is_deleted = #{searchDTO.isDeleted}
+        <if test="searchDTO.docName != null and searchDTO.docName != ''">
+            and a.doc_name like '%' || #{searchDTO.docName} || '%'
+        </if>
+        <if test="searchDTO.delStartDate != null">
+            and d.del_date between #{searchDTO.delStartDate} and #{searchDTO.delEndDate}
+        </if>
+        <if test="searchDTO.tagId != null and searchDTO.tagId.size() > 0">
+            and c.tag_id in
+            <foreach item="item" index="index" collection="searchDTO.tagId"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="searchDTO.userIds != null and searchDTO.userIds.size() > 0">
+                    AND a.doc_owner IN
+                    <foreach collection="searchDTO.userIds" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+        <if test="searchDTO.contains == true and searchDTO.suffixSize == 1">
+            and (
+            a.doc_suffix IS NULL OR a.doc_suffix NOT IN
+            <foreach item="item" index="index" collection="searchDTO.suffixAllList"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="searchDTO.contains == true and searchDTO.suffixSize != 1 and searchDTO.dicExtraList !=null and searchDTO.dicExtraList.size() > 0">
+            and (a.doc_suffix NOT IN
+            <foreach item="item" index="index" collection="searchDTO.dicExtraList"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            OR a.doc_suffix IS NULL
+            OR a.doc_suffix NOT IN
+            <foreach item="item" index="index" collection="searchDTO.suffixAllList"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="searchDTO.contains == false">
+            <if test="searchDTO.type != null">
+                and a.type != #{searchDTO.type}
+            </if>
+            <if test="searchDTO.suffixList != null and searchDTO.suffixList.size() > 0">
+                and a.doc_suffix in
+                <foreach item="item" index="index" collection="searchDTO.suffixList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+        <choose>
+            <when test="searchDTO.docType == 1">
+                and a.doc_owner = #{searchDTO.docOwner}
+            </when>
+            <otherwise>
+                and a.doc_type = 0
+                <if test="searchDTO.houseId != null">
+                    and a.house_id = #{searchDTO.houseId}
+                </if>
+            </otherwise>
+        </choose>
+        <!--排序-->
+        <choose>
+            <when test="searchDTO.delTimeSort != null and searchDTO.delTimeSort != ''">
+                <choose>
+                    <when test="searchDTO.delTimeSort == 'ascending'">
+                        ORDER BY d.del_date ASC
+                    </when>
+                    <otherwise>
+                        ORDER BY d.del_date DESC
+                    </otherwise>
+                </choose>
+            </when>
+            <when test="searchDTO.recycleDateSort !=null and searchDTO.recycleDateSort !=''">
+                <choose>
+                    <when test="searchDTO.recycleDateSort == 'ascending'">
+                        ORDER BY a.recycle_date ASC
+                    </when>
+                    <otherwise>
+                        ORDER BY a.recycle_date DESC
+                    </otherwise>
+                </choose>
+            </when>
+        </choose>
+    </sql>
+
+    <select id="selectListByrecycleIds" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT d.del_date,
+            d.recycle_id,
+            a.*
+        FROM doc_bs_recycle d
+            LEFT JOIN doc_bs_document a ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_tag_document c ON d.doc_id = c.doc_id
+        WHERE
+            a.is_deleted = 0
+            AND d.is_deleted = 0
+            AND d.recycle_id IN
+            <foreach collection="recycleIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+    </select>
+
+    <select id="selectListByBusIds" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT d.del_date,
+            d.recycle_id,
+            a.*
+        FROM doc_bs_recycle d
+            LEFT JOIN doc_bs_document a ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_tag_document c ON d.doc_id = c.doc_id
+        WHERE
+            d.is_deleted = 0
+            AND a.bus_id IN
+            <foreach collection="busIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+    </select>
+
+    <select id="selectFolderInfo" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            a.*,
+            b.house_name AS houseIdStr,
+            c.doc_name   AS folderIdStr
+        FROM doc_bs_document a
+            LEFT JOIN doc_sys_house b ON a.house_id = b.house_id
+            LEFT JOIN doc_bs_document c ON a.parent_id = c.bus_id
+        WHERE
+            a.is_deleted = 0
+            AND b.is_deleted = 0
+            AND a.bus_id=#{busId}
+    </select>
+
+    <select id="selectAuthFolderAll" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*,
+            b.permiss_type,
+            b.is_deleted AS isPermissDeleted
+        FROM doc_bs_document a
+            LEFT JOIN doc_bs_document_user b ON a.bus_id = b.doc_id
+        WHERE
+            a.is_deleted = 0
+            AND a.recycle_status = 0
+            AND a.doc_type = 0
+            AND a.type = 0
+            AND a.house_id = #{houseId}
+        ORDER BY a.doc_seq ASC, a.create_time DESC
+    </select>
+
+
+    <select id="selectAuthFolderByBusIds" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*,
+            b.permiss_type,
+            b.is_deleted AS isPermissDeleted
+        FROM doc_bs_document a
+            LEFT JOIN doc_bs_document_user b ON a.bus_id = b.doc_id
+        WHERE
+            b.is_deleted = 0
+            <if test="busId != null and busId.size() > 0">
+                AND a.bus_id IN
+                <foreach collection="busId" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="houseId != null ">
+                AND a.house_id = #{houseId}
+            </if>
+            AND (
+                (b.rel_id = #{relId1} AND b.type = #{type1})
+                OR (b.rel_id = #{relId2} AND b.type = #{type2})
+                OR (b.rel_id = #{relId3} AND b.type = #{type3})
+                <if test="teams != null and teams.size() > 0">
+                    OR (b.rel_id IN
+                    <foreach collection="teams" item="team" open="(" separator="," close=")">
+                        #{team}
+                    </foreach>
+                    AND b.type = #{type4})
+                </if>
+            )
+    </select>
+
+    <select id="selectAuthFolder" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*,
+            b.permiss_type,
+            b.is_deleted AS isPermissDeleted
+        FROM
+            doc_bs_document a
+            LEFT JOIN doc_bs_document_user b ON a.bus_id = b.doc_id
+        WHERE
+            a.type = 0
+            AND a.doc_type = 0
+            AND a.house_id = #{houseId}
+            <if test="recycleStatus != null ">
+                AND a.recycle_status = #{recycleStatus}
+            </if>
+            AND (
+                (b.rel_id = #{relId1} AND b.type = #{type1} AND b.permiss_type IN
+                <foreach collection="permissType" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+                )
+                OR (b.rel_id = #{relId2} AND b.type = #{type2} AND b.permiss_type IN
+                <foreach collection="permissType" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>)
+                OR (b.rel_id = #{relId3} AND b.type = #{type3} AND b.permiss_type IN
+                <foreach collection="permissType" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>)
+                <if test="teams != null and teams.size() > 0">
+                    OR (b.rel_id IN
+                    <foreach collection="teams" item="team" open="(" separator="," close=")">
+                        #{team}
+                    </foreach>
+                    AND b.type = #{type4} AND b.permiss_type IN
+                    <foreach collection="permissType" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>)
+                </if>
+                )
+    </select>
+
+    <select id="selectListExtendPage" resultType="com.sunyard.edm.dto.DocBsDocumentDTO">
+        SELECT
+            DISTINCT a.*
+        FROM doc_bs_document a
+            LEFT JOIN doc_bs_tag_document e ON a.bus_id = e.doc_id
+            LEFT JOIN doc_bs_doc_rel d ON a.bus_id = d.doc_id
+            LEFT JOIN doc_bs_document c ON c.rel_doc = a.bus_id
+            LEFT JOIN doc_bs_document_user u ON a.bus_id = u.doc_id
+        <if test="searchType == 'DOCUMENT'">
+            <include refid="selectExtendPageDocumentSql"/>
+        </if>
+        <if test="searchType == 'FOLDER'">
+            <include refid="selectExtendPageFolderSql"/>
+        </if>
+
+    </select>
+    <sql id="selectExtendPageDocumentSql">
+        <where>
+            <if test="extendPageDTO.attchName != null and extendPageDTO.attchName != ''">
+                and c.doc_name like '%' || #{extendPageDTO.attchName} || '%'
+                and c.type = #{extendPageDTO.file}
+            </if>
+            <if test="extendPageDTO.createStartDate != null">
+                and a.create_time between #{extendPageDTO.createStartDate} and #{extendPageDTO.createEndDate}
+            </if>
+            <if test="extendPageDTO.updateStartDate != null">
+                and a.update_time between #{extendPageDTO.updateStartDate} and #{extendPageDTO.updateEndDate}
+            </if>
+            <if test="extendPageDTO.docName != null and extendPageDTO.docName != ''">
+                and a.doc_name like '%' || #{extendPageDTO.docName} || '%'
+            </if>
+            <if test="extendPageDTO.folderId != null and extendPageDTO.folderId != ''">
+                and a.folder_id = #{extendPageDTO.folderId}
+            </if>
+
+            <if test="extendPageDTO.folderIds != null and extendPageDTO.folderIds.size() > 0">
+                and a.folder_id in
+                <foreach item="item" index="index" collection="extendPageDTO.folderIds"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="extendPageDTO.folderId != null and extendPageDTO.folderId != ''">
+                and a.folder_id = #{extendPageDTO.folderId}
+            </if>
+            <if test="extendPageDTO.document != null">
+                and a.type = #{extendPageDTO.document}
+            </if>
+            <include refid="handleRelBusId"/>
+            <include refid="handleSuffixSearchSql"/>
+        </where>
+        <include refid="sortSql"/>
+    </sql>
+
+
+    <sql id="selectExtendPageFolderSql">
+        <where>
+            <if test="extendPageDTO.attchName != null and extendPageDTO.attchName != ''">
+                and c.doc_name = #{extendPageDTO.attchName}
+                and c.type = #{extendPageDTO.file}
+            </if>
+            <if test="extendPageDTO.createStartDate != null">
+                and a.create_time between #{extendPageDTO.createStartDate} and #{extendPageDTO.createEndDate}
+            </if>
+            <if test="extendPageDTO.updateStartDate != null">
+                and a.update_time between #{extendPageDTO.updateStartDate} and #{extendPageDTO.updateEndDate}
+            </if>
+            <if test="extendPageDTO.docName != null and extendPageDTO.docName != ''">
+                and a.doc_name like '%' || #{extendPageDTO.docName} || '%'
+            </if>
+            <if test="extendPageDTO.folderId != null and extendPageDTO.folderId != ''">
+                and a.folder_id = #{extendPageDTO.folderId}
+            </if>
+
+            <if test="extendPageDTO.types != null and extendPageDTO.types.size() > 0">
+                and a.type in
+                <foreach item="item" index="index" collection="extendPageDTO.types"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+           <include refid="handleRelBusId"/>
+            <include refid="handleSuffixSearchSql"/>
+        </where>
+        <include refid="sortSql"/>
+    </sql>
+    <sql id="handleRelBusId">
+        and a.recycle_status = #{extendPageDTO.recycleStatus}
+        and a.is_deleted = #{extendPageDTO.isDeleted}
+        <choose>
+            <when test="extendPageDTO.docType != null and extendPageDTO.docType == 1">
+
+                and a.doc_owner = #{extendPageDTO.docOwner} and a.doc_type = #{extendPageDTO.docType}
+            </when>
+            <otherwise>
+                <if test="extendPageDTO.showFlag != null and extendPageDTO.showFlag == true">
+                    <if test="extendPageDTO.relBusId != null and extendPageDTO.relBusId.size() > 0">
+                        and a.bus_id not in
+                        <foreach item="item1" index="index" collection="extendPageDTO.relBusId"
+                                 open="(" separator="," close=")">
+                            #{item1}
+                        </foreach>
+
+                    </if>
+                    AND (
+                    <!-- 机构条件 -->
+                    (u.rel_id = #{extendPageDTO.instId}
+                    AND u.type = #{extendPageDTO.inst}
+                    AND u.permiss_type IN
+                    <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                             close=")">
+                        #{item}
+                    </foreach>)
+                    <!-- 部门条件 -->
+                    or( u.rel_id = #{extendPageDTO.deptId}
+                    AND u.type = #{extendPageDTO.dept}
+                    AND u.permiss_type IN
+                    <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                             close=")">
+                        #{item}
+                    </foreach>)
+                    <!-- 用户条件 -->
+                    or( u.rel_id = #{extendPageDTO.tokenId}
+                    AND u.type = #{extendPageDTO.user}
+                    AND u.permiss_type IN
+                    <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                             close=")">
+                        #{item}
+                    </foreach>)
+                    <!-- 团队条件（动态判断） -->
+
+                    <if test="extendPageDTO.relIds != null and extendPageDTO.relBusId.size() > 0">
+                        or(
+                        u.rel_id IN
+                        <foreach collection="extendPageDTO.relIds" item="teamId" open="(" separator=","
+                                 close=")">
+                            #{teamId}
+                        </foreach>
+                        AND u.type = #{extendPageDTO.team}
+                        AND u.permiss_type IN
+                        <foreach collection="extendPageDTO.permissType" item="item" open="(" separator=","
+                                 close=")">
+                            #{item}
+                        </foreach>
+                        )
+                    </if>
+                    )
+                </if>
+
+                and a.house_id = #{extendPageDTO.houseId}
+                and a.doc_type =#{extendPageDTO.docType}
+                <if test="extendPageDTO.tagId != null">
+                    and e.tag_id = #{extendPageDTO.tagId}
+                </if>
+                <!--<if test="extendPageDTO.docOwnerStr != null">
+                    and f.name like '%' || #{extendPageDTO.docOwnerStr} || '%'
+                </if>-->
+                <if test="extendPageDTO.userIds != null and extendPageDTO.userIds.size() > 0">
+                    AND a.doc_owner IN
+                    <foreach collection="extendPageDTO.userIds" item="item" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="extendPageDTO.relBusId != null and extendPageDTO.relBusId.size() > 0">
+                    and a.bus_id not in
+                    <foreach item="item1" index="index" collection="extendPageDTO.relBusId"
+                             open="(" separator="," close=")">
+                        #{item1}
+                    </foreach>
+
+                </if>
+            </otherwise>
+        </choose>
+    </sql>
+    <sql id="handleSuffixSearchSql">
+        <if test="extendPageDTO.contains == true and extendPageDTO.suffixSize == 1">
+            and (
+            a.doc_suffix IS NULL OR a.doc_suffix NOT IN
+            <foreach item="item" index="index" collection="extendPageDTO.suffixAllList"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="extendPageDTO.contains == true and extendPageDTO.suffixSize != 1 and extendPageDTO.dicExtraList !=null and extendPageDTO.dicExtraList.size() > 0">
+            and (a.doc_suffix NOT IN
+            <foreach item="item" index="index" collection="extendPageDTO.dicExtraList"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            OR a.doc_suffix IS NULL
+            OR a.doc_suffix NOT IN
+            <foreach item="item" index="index" collection="extendPageDTO.suffixAllList"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="extendPageDTO.contains == false">
+            <if test="extendPageDTO.type != null">
+                and a.type != #{extendPageDTO.type}
+            </if>
+            <if test="extendPageDTO.suffixList != null and extendPageDTO.suffixList.size() > 0">
+                and a.doc_suffix in
+                <foreach item="item" index="index" collection="extendPageDTO.suffixList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </if>
+    </sql>
+<sql id="sortSql">
+    <!--排序-->
+    <choose>
+        <when test="extendPageDTO.createTimeSort != null and extendPageDTO.createTimeSort != ''">
+            <choose>
+                <when test="extendPageDTO.createTimeSort == 'ascending'">
+                    ORDER BY a.create_time ASC
+                </when>
+                <otherwise>
+                    ORDER BY a.create_time DESC
+                </otherwise>
+            </choose>
+        </when>
+        <when test="extendPageDTO.updateTimeSort !=null and extendPageDTO.updateTimeSort !=''">
+            <choose>
+                <when test="extendPageDTO.updateTimeSort == 'ascending'">
+                    ORDER BY a.update_time ASC
+                </when>
+                <otherwise>
+                    ORDER BY a.update_time DESC
+                </otherwise>
+            </choose>
+        </when>
+        <otherwise>
+            ORDER BY a.create_time DESC
+        </otherwise>
+    </choose>
+</sql>
+    <select id="queryGrounding" resultType="com.sunyard.edm.dto.DocBsCompanyGroundingDTO">
+        SELECT
+            a.*
+        FROM
+            (SELECT
+                d.doc_status,
+                d.type,
+                d.doc_owner,
+                d.doc_suffix,
+                d.bus_id AS docId,
+                d.doc_name,
+                d.doc_size,
+                d.upload_time AS uploadTime,
+                d.lower_time AS lowerTime,
+                d.recycle_status,
+                d.is_deleted,
+                CASE WHEN u.doc_id IS NOT NULL THEN 0 ELSE 1 END AS isAsh,
+                CASE WHEN uu.doc_id IS NOT NULL THEN 0 ELSE 1 END AS isSelect
+            FROM doc_bs_document d
+                LEFT JOIN
+                    (SELECT
+                        DISTINCT doc_id
+                    FROM doc_bs_document_user
+                    WHERE
+                        is_deleted = 0
+                        AND rel_id IN
+                        <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+                            #{item}
+                        </foreach>
+                ) u ON u.doc_id = d.bus_id
+                LEFT JOIN
+                    (SELECT
+                        DISTINCT doc_id
+                    FROM doc_bs_document_user
+                    WHERE
+                        is_deleted = 0
+                        AND permiss_type = 2
+                        AND rel_id IN
+                        <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+                            #{item}
+                        </foreach>
+                    ) uu ON uu.doc_id = d.bus_id
+                ) a
+            <if test="tagList != null and tagList.size() != 0">
+                JOIN
+                    (SELECT
+                        doc_id
+                    FROM doc_bs_tag_document
+                    WHERE
+                        tag_id IN
+                    <foreach collection="tagList" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                ) t ON t.doc_id = a.docId
+            </if>
+        WHERE
+            a.is_deleted = 0 AND a.type = 1 AND a.recycle_status = 0
+            <if test="docStatus != null ">
+                AND a.doc_status = #{docStatus}
+            </if>
+            <if test="docName != null and docName != ''">
+                AND a.doc_name LIKE '%' || #{docName} || '%'
+            </if>
+            <!--<if test="owner != null and owner != ''">
+                AND a.docOwnerName LIKE '%' || #{owner} || '%'
+            </if>-->
+            <if test="uploadTimeTo != null and uploadTimeDo != null">
+                AND a.uploadTime BETWEEN #{uploadTimeTo} AND #{uploadTimeDo}
+            </if>
+            <if test="lowerTimeTo != null and lowerTimeDo != null">
+                AND a.lowerTime BETWEEN #{lowerTimeTo} AND #{lowerTimeDo}
+            </if>
+        <choose>
+            <when test="uploadTimeSort != null and uploadTimeSort != '' ">
+                <if test="uploadTimeSort == 'ascending'">
+                    ORDER BY a.uploadTime ASC
+                </if>
+                <if test="uploadTimeSort == 'descending'">
+                    ORDER BY a.uploadTime DESC
+                </if>
+            </when>
+            <when test="lowerTimeSort != null and lowerTimeSort != '' ">
+                <if test="lowerTimeSort == 'ascending'">
+                    ORDER BY a.lowerTime ASC
+                </if>
+                <if test="lowerTimeSort == 'descending'">
+                    ORDER BY a.lowerTime DESC
+                </if>
+            </when>
+            <otherwise>
+                ORDER BY a.lowerTime DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchLevelFolder" resultType="com.sunyard.edm.dto.DocBsLevelFolderDTO">
+        SELECT
+            t.doc_id,
+            LISTAGG(d.doc_name, '/') WITHIN GROUP (ORDER BY d.folder_level) AS folderName
+        FROM doc_bs_document_tree t
+            LEFT JOIN doc_bs_document d ON d.bus_id = t.father_id
+        WHERE
+            doc_id = #{folderId}
+        GROUP BY t.doc_id
+    </select>
+
+
+</mapper>

@@ -1,0 +1,41 @@
+--- #################### client 客户端 ####################
+management:
+  # 2. 关闭敏感端点（双重保险）
+  endpoint:
+    health:
+      show-details: when_authorized  # 仅认证用户可见详细信息
+    info:
+      enabled: true
+    # 显式关闭危险端点（即使未暴露也禁用）
+    env:
+      enabled: false
+    beans:
+      enabled: false
+    shutdown:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+        include: health,info
+spring:
+  boot:
+    admin:
+      client:
+        instance:
+          # 注册实例时，优先使用 IP [IP, HOST_NAME, CANONICAL_HOST_NAME]
+          service-host-type: IP
+--- #################### client 客户端 个性化配置 ####################
+management:
+  health:
+    ldap:
+      enabled: false
+--- #################### Server 服务端 ####################
+spring:
+  boot:
+    admin:
+      ui:
+        brand: 应用监控平台
+        #对应nginx入口的地址
+        public-url: http://127.0.0.1:${server.port}/admin
+      context-path: /admin

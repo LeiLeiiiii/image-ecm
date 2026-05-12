@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXIF信息读取器 - 相机应用图片分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4a6ee0 0%, #6a11cb 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px dashed #667eea;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 30px;
+            text-align: center;
+            background: #f0f4ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover {
+            background: #e6ebff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            background: #dbe4ff;
+            border-color: #4a6ee0;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .exif-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .exif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .exif-header h2 {
+            color: #333;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .md5-badge {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .exif-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .exif-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .exif-item:hover {
+            transform: translateX(5px);
+        }
+
+        .exif-category {
+            font-weight: bold;
+            color: #4a6ee0;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exif-properties {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .exif-label {
+            font-weight: 600;
+            color: #555;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .exif-value {
+            color: #333;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+
+        .exif-value.highlight {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .exif-value.gps {
+            color: #ef4444;
+            font-weight: bold;
+        }
+
+        .gps-link {
+            color: #3b82f6;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gps-link:hover {
+            text-decoration: underline;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #cbd5e1;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .no-data-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: white;
+            background: rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    <!-- EXIF.js 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <!-- 字体图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>
+            <i class="fas fa-camera-retro icon"></i>
+           相机应用EXIF信息读取器
+        </h1>
+        <p>上传从相机应用拍摄的照片，解析并显示完整的EXIF信息，包括GPS位置、拍摄时间、设备信息等</p>
+    </header>
+
+    <div class="main-content">
+        <!-- 上传区域 -->
+        <div class="upload-section">
+            <div class="upload-area" id="dropArea">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-text">点击或拖拽图片到此区域</div>
+                <div class="upload-subtext">支持 JPG、JPEG 格式，最大 20MB</div>
+                <input type="file" id="fileInput" class="file-input" accept=".jpg,.jpeg,.png" multiple>
+            </div>
+
+            <div class="image-preview" id="imagePreview" style="display: none;">
+                <img id="previewImage" class="preview-img" src="" alt="预览">
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i>
+                    选择图片
+                </button>
+                <button class="btn btn-secondary" onclick="resetAll()">
+                    <i class="fas fa-redo"></i>
+                    重置
+                </button>
+            </div>
+        </div>
+
+        <!-- EXIF信息显示区域 -->
+        <div class="exif-section">
+            <div class="exif-header">
+                <h2>
+                    <i class="fas fa-info-circle"></i>
+                    EXIF信息详情
+                </h2>
+                <div id="md5Badge" class="md5-badge" style="display: none;">
+                    <i class="fas fa-fingerprint"></i>
+                    <span id="md5Value"></span>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在解析EXIF信息...</p>
+            </div>
+
+            <div class="no-data" id="noData">
+                <div class="no-data-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3>暂无图片数据</h3>
+                <p>请上传一张图片以查看EXIF信息</p>
+            </div>
+
+            <div id="exifContent" class="exif-grid" style="display: none;">
+                <!-- EXIF信息将通过JavaScript动态插入 -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>本工具用于读取从鸿蒙相机应用拍摄的照片EXIF信息 |
+            <a href="#" onclick="showHelp()">使用帮助</a> |
+            <a href="#" onclick="showAbout()">关于</a></p>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // DOM元素
+    const fileInput = document.getElementById('fileInput');
+    const dropArea = document.getElementById('dropArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const loading = document.getElementById('loading');
+    const noData = document.getElementById('noData');
+    const exifContent = document.getElementById('exifContent');
+    const md5Badge = document.getElementById('md5Badge');
+    const md5Value = document.getElementById('md5Value');
+    const toast = document.getElementById('toast');
+
+    // 显示提示信息
+    function showToast(message, type = 'success') {
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+
+        toast.style.background = colors[type] || colors.info;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        toast.style.display = 'flex';
+
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    // 重置所有内容
+    function resetAll() {
+        fileInput.value = '';
+        imagePreview.style.display = 'none';
+        exifContent.style.display = 'none';
+        md5Badge.style.display = 'none';
+        noData.style.display = 'block';
+        exifContent.innerHTML = '';
+    }
+
+    // 文件拖拽功能
+    dropArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropArea.classList.add('dragover');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('dragover');
+    });
+
+    dropArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropArea.classList.remove('dragover');
+
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFiles(e.dataTransfer.files);
+        }
+    });
+
+    // 文件选择处理
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFiles(e.target.files);
+        }
+    });
+
+    // 处理文件
+    function handleFiles(files) {
+        if (files.length > 1) {
+            showToast('一次只能处理一张图片', 'warning');
+            return;
+        }
+
+        const file = files[0];
+        if (!file.type.match('image.*')) {
+            showToast('请选择图片文件', 'error');
+            return;
+        }
+
+        if (file.size > 20 * 1024 * 1024) {
+            showToast('图片大小不能超过20MB', 'error');
+            return;
+        }
+
+        // 显示预览
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+
+        // 解析EXIF
+        parseExif(file);
+    }
+
+    // 解析EXIF信息
+    function parseExif(file) {
+        loading.style.display = 'block';
+        noData.style.display = 'none';
+        exifContent.style.display = 'none';
+
+        EXIF.getData(file, function() {
+            loading.style.display = 'none';
+
+            const exifData = {};
+            console.log(this.exifdata);
+
+            // 获取所有EXIF标签
+            const allTags = EXIF.getAllTags(this);
+
+            // 常用EXIF信息
+            exifData.basic = {
+                '文件名': file.name,
+                '文件大小': formatFileSize(file.size),
+                'MIME类型': file.type,
+                '最后修改时间': new Date(file.lastModified).toLocaleString()
+            };
+
+            // 相机信息
+            exifData.camera = {
+                '相机品牌': allTags.Make || '未知',
+                '相机型号': allTags.Model || '未知',
+                '软件版本': allTags.Software || '未知',
+                '固件版本': allTags.Firmware || '未知'
+            };
+
+            // 拍摄信息
+            exifData.shot = {
+                '拍摄时间': formatDateTime(allTags.DateTimeOriginal || allTags.DateTime),
+                '曝光时间': allTags.ExposureTime ? `${allTags.ExposureTime}秒` : '未知',
+                '光圈值': allTags.FNumber ? `f/${allTags.FNumber}` : '未知',
+                'ISO感光度': allTags.ISO || '未知',
+                '焦距': allTags.FocalLength ? `${allTags.FocalLength}mm` : '未知',
+                '闪光灯': getFlashMode(allTags.Flash),
+                '白平衡': getWhiteBalance(allTags.WhiteBalance),
+                '曝光模式': getExposureMode(allTags.ExposureMode),
+                '测光模式': getMeteringMode(allTags.MeteringMode)
+            };
+
+            // GPS信息
+            exifData.gps = {};
+            if (allTags.GPSLatitude && allTags.GPSLongitude) {
+                const lat = convertGPSCoordinates(allTags.GPSLatitude, allTags.GPSLatitudeRef);
+                const lng = convertGPSCoordinates(allTags.GPSLongitude, allTags.GPSLongitudeRef);
+                const alt = allTags.GPSAltitude || 0;
+
+                exifData.gps = {
+                    '纬度': `${lat} (${allTags.GPSLatitudeRef})`,
+                    '经度': `${lng} (${allTags.GPSLongitudeRef})`,
+                    '海拔': `${alt}米`,
+                    'GPS时间': allTags.GPSTimeStamp ? formatGPSTime(allTags.GPSTimeStamp) : '未知',
+                    'GPS地图': lat && lng ?
+                        `<a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" class="gps-link">
+                            <i class="fas fa-map-marker-alt"></i> 查看地图位置
+                        </a>` : '不可用'
+                };
+            } else {
+                exifData.gps = {
+                    'GPS信息': '无GPS数据'
+                };
+            }
+
+            // EXIF元数据
+            exifData.metadata = {
+                '图像宽度': allTags.PixelXDimension || '未知',
+                '图像高度': allTags.PixelYDimension || '未知',
+                '色彩空间': getColorSpace(allTags.ColorSpace),
+                '方向': getOrientation(allTags.Orientation),
+                '分辨率': getResolution(allTags.XResolution, allTags.YResolution),
+                '压缩': getCompression(allTags.Compression),
+                'YCbCr定位': allTags.YCbCrPositioning || '未知'
+            };
+
+            // UserComment (鸿蒙相机写入的MD5)
+            exifData.custom = {};
+            if (allTags.UserComment) {
+                const userComment = allTags.UserComment.toString();
+                exifData.custom['用户注释'] = userComment;
+
+                // 提取MD5
+                const md5Match = userComment.match(/MD5:([a-fA-F0-9]{32})/);
+                if (md5Match) {
+                    exifData.custom['MD5哈希'] = md5Match[1];
+                    md5Value.textContent = md5Match[1];
+                    md5Badge.style.display = 'inline-flex';
+                }
+            }
+
+            // 其他EXIF信息
+            exifData.other = {};
+            for (const tag in allTags) {
+                if (!['Make', 'Model', 'Software', 'DateTimeOriginal', 'DateTime',
+                      'ExposureTime', 'FNumber', 'ISO', 'FocalLength', 'Flash',
+                      'WhiteBalance', 'ExposureMode', 'MeteringMode', 'GPSLatitude',
+                      'GPSLongitude', 'GPSLatitudeRef', 'GPSLongitudeRef', 'GPSAltitude',
+                      'GPSTimeStamp', 'PixelXDimension', 'PixelYDimension', 'ColorSpace',
+                      'Orientation', 'XResolution', 'YResolution', 'Compression',
+                      'YCbCrPositioning', 'UserComment'].includes(tag)) {
+                    exifData.other[tag] = allTags[tag];
+                }
+            }
+
+            // 显示EXIF信息
+            displayExifInfo(exifData);
+            showToast('EXIF信息解析成功', 'success');
+        });
+    }
+
+    // 显示EXIF信息
+    function displayExifInfo(exifData) {
+        exifContent.innerHTML = '';
+        exifContent.style.display = 'grid';
+
+        const categories = {
+            'basic': { title: '文件信息', icon: 'fa-file' },
+            'camera': { title: '相机信息', icon: 'fa-camera' },
+            'shot': { title: '拍摄参数', icon: 'fa-sliders-h' },
+            'gps': { title: 'GPS位置', icon: 'fa-map-marker-alt' },
+            'metadata': { title: '图像元数据', icon: 'fa-info-circle' },
+            'custom': { title: '自定义数据', icon: 'fa-user-edit' },
+            'other': { title: '其他EXIF信息', icon: 'fa-list' }
+        };
+
+        for (const [categoryKey, categoryInfo] of Object.entries(categories)) {
+            const data = exifData[categoryKey];
+            if (!data || Object.keys(data).length === 0) continue;
+
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'exif-item';
+
+            const categoryHeader = document.createElement('div');
+            categoryHeader.className = 'exif-category';
+            categoryHeader.innerHTML = `<i class="fas ${categoryInfo.icon}"></i> ${categoryInfo.title}`;
+
+            const propertiesDiv = document.createElement('div');
+            propertiesDiv.className = 'exif-properties';
+
+            for (const [key, value] of Object.entries(data)) {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'exif-label';
+                labelDiv.textContent = key;
+
+                const valueDiv = document.createElement('div');
+                valueDiv.className = 'exif-value';
+
+                if (categoryKey === 'gps' && key !== 'GPS信息') {
+                    valueDiv.classList.add('gps');
+                }
+
+                if (key.includes('MD5') || key.includes('哈希')) {
+                    valueDiv.classList.add('highlight');
+                }
+
+                // 处理HTML内容
+                if (typeof value === 'string' && value.includes('<a href')) {
+                    valueDiv.innerHTML = value;
+                } else {
+                    valueDiv.textContent = formatValue(value);
+                }
+
+                propertiesDiv.appendChild(labelDiv);
+                propertiesDiv.appendChild(valueDiv);
+            }
+
+            categoryDiv.appendChild(categoryHeader);
+            categoryDiv.appendChild(propertiesDiv);
+            exifContent.appendChild(categoryDiv);
+        }
+    }
+
+    // 工具函数
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function formatDateTime(dateTimeStr) {
+        if (!dateTimeStr) return '未知';
+        // EXIF日期格式: "YYYY:MM:DD HH:MM:SS"
+        const [date, time] = dateTimeStr.split(' ');
+        const [year, month, day] = date.split(':');
+        return `${year}-${month}-${day} ${time}`;
+    }
+
+    function formatGPSTime(timeArray) {
+        if (!timeArray) return '未知';
+        const [hours, minutes, seconds] = timeArray;
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
+    function convertGPSCoordinates(coordinate, ref) {
+        if (!coordinate) return null;
+
+        const [deg, min, sec] = coordinate.map(n => typeof n === 'object' ? n.numerator / n.denominator : n);
+        let decimal = deg + min / 60 + sec / 3600;
+
+        if (ref === 'S' || ref === 'W') {
+            decimal = -decimal;
+        }
+
+        return decimal.toFixed(6);
+    }
+
+    function getFlashMode(flash) {
+        if (flash === undefined) return '未知';
+        const modes = {
+            0x0: '未使用',
+            0x1: '闪光',
+            0x5: '闪光但未检测到反光',
+            0x7: '闪光且检测到反光',
+            0x8: '开启',
+            0x9: '开启但未闪光',
+            0xd: '开启但未闪光',
+            0xf: '关闭',
+            0x10: '关闭但闪光',
+            0x18: '自动',
+            0x19: '自动未闪光',
+            0x1d: '自动未闪光',
+            0x1f: '自动闪光',
+            0x20: '无闪光功能',
+            0x41: '开启红眼消除',
+            0x45: '开启红眼消除但未闪光',
+            0x47: '开启红眼消除且闪光',
+            0x49: '自动红眼消除',
+            0x4d: '自动红眼消除但未闪光',
+            0x4f: '自动红眼消除且闪光'
+        };
+        return modes[flash] || `未知 (${flash})`;
+    }
+
+    function getWhiteBalance(wb) {
+        if (wb === undefined) return '未知';
+        return wb === 1 ? '自动' : '手动';
+    }
+
+    function getExposureMode(mode) {
+        if (mode === undefined) return '未知';
+        const modes = {
+            0: '自动曝光',
+            1: '手动曝光',
+            2: '自动包围曝光'
+        };
+        return modes[mode] || `未知 (${mode})`;
+    }
+
+    function getMeteringMode(mode) {
+        if (mode === undefined) return '未知';
+        const modes = {
+            0: '未知',
+            1: '平均测光',
+            2: '中央重点平均测光',
+            3: '点测光',
+            4: '多点测光',
+            5: '多区域测光',
+            6: '部分测光',
+            255: '其他'
+        };
+        return modes[mode] || `未知 (${mode})`;
+    }
+
+    function getColorSpace(colorSpace) {
+        if (colorSpace === undefined) return '未知';
+        return colorSpace === 1 ? 'sRGB' : '未校准';
+    }
+
+    function getOrientation(orientation) {
+        if (orientation === undefined) return '正常';
+        const orientations = {
+            1: '正常',
+            2: '水平翻转',
+            3: '旋转180°',
+            4: '垂直翻转',
+            5: '顺时针旋转90°后水平翻转',
+            6: '顺时针旋转90°',
+            7: '逆时针旋转90°后水平翻转',
+            8: '逆时针旋转90°'
+        };
+        return orientations[orientation] || `未知 (${orientation})`;
+    }
+
+    function getResolution(xRes, yRes) {
+        if (!xRes || !yRes) return '未知';
+        return `${xRes} × ${yRes} dpi`;
+    }
+
+    function getCompression(compression) {
+        if (compression === undefined) return '未知';
+        return compression === 6 ? 'JPEG压缩' : `其他 (${compression})`;
+    }
+
+    function formatValue(value) {
+        if (value === null || value === undefined) return '未知';
+        if (typeof value === 'object') {
+            if (Array.isArray(value)) {
+                return value.join(', ');
+            }
+            return JSON.stringify(value);
+        }
+        return value.toString();
+    }
+
+    // 弹出帮助信息
+    function showHelp() {
+        alert(`使用说明：
+1. 点击"选择图片"按钮或拖拽图片到上传区域
+2. 选择从鸿蒙相机应用拍摄的JPG/JPEG图片
+3. 工具将自动解析图片的EXIF信息
+4. 查看GPS位置、拍摄参数、相机信息等
+5. 支持查看鸿蒙相机写入的MD5哈希值
+
+注意：
+- 仅支持JPG/JPEG格式的图片
+- 图片大小限制为20MB
+- EXIF信息可能因设备而异`);
+    }
+
+    function showAbout() {
+        alert(`鸿蒙相机应用EXIF信息读取器 v1.0
+
+功能：
+- 读取并显示完整的EXIF信息
+- 解析GPS坐标并支持地图查看
+- 显示鸿蒙相机写入的MD5哈希值
+- 支持拖拽上传
+- 响应式设计，支持移动设备
+
+技术：
+- 使用EXIF.js库解析图片元数据
+- 纯前端实现，无需上传到服务器
+- 支持所有现代浏览器
+
+开发者：鸿蒙相机应用开发团队
+用途：用于调试和验证鸿蒙相机应用的EXIF写入功能`);
+    }
+
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        showToast('页面加载完成，请上传图片查看EXIF信息', 'info');
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sunyard.cloud</groupId>
+        <artifactId>sunyard</artifactId>
+        <version>1.0.5-SNAPSHOT</version>
+    </parent>
+    <artifactId>sunyard-framework</artifactId>
+
+    <name>${project.artifactId}</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <!--工具包-->
+        <module>sunyard-common</module>
+        <module>sunyard-img</module>
+        <module>sunyard-spire</module>
+        <module>sunyard-ofd</module>
+        <module>sunyard-mq</module>
+        <module>sunyard-monitor</module>
+        <module>sunyard-video</module>
+        <!--组件包-->
+        <!--自动装配-->
+        <module>sunyard-starter-licence</module>
+        <module>sunyard-starter-mybatis</module>
+        <module>sunyard-starter-redis</module>
+        <module>sunyard-starter-rpc</module>
+        <module>sunyard-starter-job</module>
+        <module>sunyard-starter-log</module>
+        <module>sunyard-starter-ocr</module>
+        <module>sunyard-starter-elasticsearch</module>
+        <module>sunyard-starter-onlyoffice</module>
+        <module>sunyard-oauth</module>
+        <!--待完善-->
+        <module>sunyard-starter-message</module>
+    </modules>
+</project>

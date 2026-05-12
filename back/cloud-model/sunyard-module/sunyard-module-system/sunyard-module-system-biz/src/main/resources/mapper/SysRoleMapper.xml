@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysRoleMapper">
+
+    <select id="searchLinkedRole" resultType="com.sunyard.module.system.po.SysRole">
+        SELECT
+            a.role_id,
+            a.name
+        FROM sys_role a,
+             sys_role_user b
+        WHERE
+            a.role_id = b.role_id
+            AND b.is_deleted = 0
+            AND a.is_deleted = 0
+            AND b.user_id = #{userId}
+    </select>
+
+    <select id="searchRoleNameByUserId" resultType="com.sunyard.module.system.po.SysRole">
+        SELECT
+            name
+        FROM sys_role
+        WHERE
+            is_deleted = 0
+            AND role_id IN (
+                            SELECT
+                                role_id
+                            FROM sys_role_user
+                            WHERE
+                                is_deleted = 0
+                              AND user_id = #{userId}
+                            )
+    </select>
+    <select id="searchList" resultType="com.sunyard.module.system.po.SysRole">
+        SELECT
+            role_id,
+            name,
+            role_code
+        FROM sys_role
+        WHERE
+            role_id IN (
+                        SELECT
+                            DISTINCT role.role_id
+                        FROM sys_menu menu
+                            JOIN sys_role_menu role ON ( menu.menu_id = role.menu_id AND menu.menu_system = #{sysRoleDTO.systemCode} )
+                                AND menu.is_deleted = 0
+                                AND role.is_deleted = 0
+                        )
+        <!-- 模糊匹配 name -->
+        <if test="sysRoleDTO.name != null and sysRoleDTO.name != ''">
+            AND name LIKE CONCAT(#{sysRoleDTO.name}, '%')
+        </if>
+        <!-- 模糊匹配 role_code -->
+        <if test="sysRoleDTO.roleCode != null and sysRoleDTO.roleCode != ''">
+            AND role_code LIKE CONCAT(#{sysRoleDTO.roleCode}, '%')
+        </if>
+        <!-- 根据 role_id 过滤 -->
+        <if test="roleIdsByUser != null and !roleIdsByUser.isEmpty()">
+            AND role_id IN
+            <foreach item="item" collection="roleIdsByUser" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

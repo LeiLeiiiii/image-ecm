@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsMessageMapper">
+    <select id="searchExtend" resultType="com.sunyard.edm.dto.DocBsMessageDTO">
+        SELECT
+            m.message_type AS type,
+            m.message_status AS isRead,
+            m.message_title AS title,
+            m.message_content AS content,
+            m.doc_folder AS url,
+            m.doc_parent_id AS lastFolderId,
+            m.inform_time AS time,
+            m.message_id AS id,
+            m.doc_house_id AS documentHouseId,
+            hu.house_id,
+            bu.doc_id
+        FROM doc_bs_message m
+            LEFT JOIN doc_bs_document d ON m.doc_parent_id = d.bus_id
+            LEFT JOIN
+                (SELECT
+                    DISTINCT house_id
+                FROM doc_sys_house_user
+                WHERE
+                    is_deleted = 0
+                    AND rel_id IN
+                    <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                ) hu ON hu.house_id = d.house_id
+            LEFT JOIN
+                (SELECT
+                    DISTINCT doc_id
+                FROM doc_bs_document_user
+                WHERE
+                    is_deleted = 0
+                    AND rel_id IN
+                    <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                ) bu ON bu.doc_id = d.bus_id
+        WHERE
+            m.user_id = #{userId}
+            AND TRUNC(SYSDATE) - 30 &lt;= TRUNC(m.create_time)
+        ORDER BY m.create_time DESC
+    </select>
+
+    <select id="searchListHome" resultType="com.sunyard.edm.dto.DocBsHomeDTO">
+        SELECT
+            message_id AS id,
+            message_content AS messageContent,
+            doc_folder AS docFolder,
+            message_status AS isRead,
+            inform_time AS time
+        FROM doc_bs_message
+        WHERE
+            user_id = #{userId}
+        ORDER BY inform_time DESC
+    </select>
+</mapper>

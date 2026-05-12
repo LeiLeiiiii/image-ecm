@@ -1,0 +1,227 @@
+#数据库连接配置
+#druid
+spring:
+  redis:
+    database: 0
+    host: 172.1.3.102
+    port: 6379
+    password: "123456"
+    #自制redis分布式锁最长有效时间
+    max-lock-time: 180
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 下面为连接池的补充设置，应用到上面所有数据源中
+      # 初始化大小，最小，最大
+      initial-size: 10
+      min-idle: 20
+      max-active: 100
+      # 配置获取连接等待超时的时间
+      max-wait: 60000
+      connectTimeout: 600000
+      socketTimeout: 600000
+      # 每60秒运行一次空闲连接回收器
+      time-between-eviction-runs-millis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      min-evictable-idle-time-millis: 300000
+      # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除.
+      test-while-idle: true
+      # 建议配置为false。获取连接时执行validationQuery检测连接是否有效，这个配置会降低性能。
+      test-on-borrow: false
+      # 建议配置为false。获取连接时执行validationQuery检测连接是否有效，这个配置会降低性能。
+      test-on-return: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      # 验证连接是否可用，使用的SQL语句
+      validation-query: SELECT 1
+      #   配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall用于防火墙
+      max-pool-prepared-statement-per-connection-size: 20
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connect-properties:
+        druid.stat.mergeSql: true
+        druid.stat.slowSqlMillis: 2000
+      # 合并多个DruidDataSource的监控数据
+      use-global-data-source-stat: true
+      # 监控过滤器  可视化页面地址:  http://localhost:8085/druid/login.html
+      webStatFilter:
+        #  是否开启监控
+        enabled: true
+      # 提供监控信息展示的html页面;提供监控信息的JSON API
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        #  监控路径
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username: admin
+        login-password: sunyard
+      # 慢sql记录
+      filter:
+        stat:
+          enabled: true # 开启DruidDataSource状态监控
+          log-slow-sql: true # 开启慢SQL记录功能,启用后如果遇到执行很慢的 SQL，便会输出到日志中，
+          slow-sql-millis: 1000  # 默认3000毫秒，这里超过5s，就是慢，记录到日志
+          merge-sql: true
+        # 防御SQL注入
+        wall:
+          config:
+            multi-statement-allow: true
+    dynamic:
+      primary: EDMDataSource #设置默认的数据源或者数据源组,默认值即为master
+      datasource:
+        EDMDataSource: # ecm服务数据源
+          url: "jdbc:mysql://172.1.4.213:3306/dev_edm?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&createDatabaseIfNotExist=true&allowMultiQueries=true&socketTimeout=60000&rewriteBatchedStatements=true"
+          username: "root"
+          password: "123456"
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          type: com.alibaba.druid.pool.DruidDataSource
+          druid:
+            initial-size: 10 #连接池初始化大小
+            min-idle: 20 #最小空闲连接数
+            max-active: 100 #最大连接数
+            connectTimeout: 600000
+            socketTimeout: 600000
+        ECMDataSource: # ecm服务数据源
+          url: "jdbc:mysql://172.1.4.213:3306/dev_ecm?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&createDatabaseIfNotExist=true&allowMultiQueries=true&socketTimeout=60000&rewriteBatchedStatements=true"
+          username: "root"
+          password: "123456"
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          type: com.alibaba.druid.pool.DruidDataSource
+          druid:
+            initial-size: 10 #连接池初始化大小
+            min-idle: 20 #最小空闲连接数
+            max-active: 100 #最大连接数
+            connectTimeout: 600000
+            socketTimeout: 600000
+        storageDataSource: # 存储服务数据源
+          url: "jdbc:mysql://172.1.4.213:3306/dev_sunyard_storage?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&createDatabaseIfNotExist=true&rewriteBatchedStatements=true"
+          username: "root"
+          password: "123456"
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          type: com.alibaba.druid.pool.DruidDataSource
+          druid:
+            initial-size: 10 #连接池初始化大小
+            min-idle: 20 #最小空闲连接数
+            max-active: 100 #最大连接数
+            connectTimeout: 600000
+            socketTimeout: 600000
+        systemDataSource: # 系统服务数据源
+          url: "jdbc:mysql://172.1.4.213:3306/dev_sunyard_system?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&createDatabaseIfNotExist=true&socketTimeout=60000&allowMultiQueries=true&rewriteBatchedStatements=true"
+          username: "root"
+          password: "123456"
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          type: com.alibaba.druid.pool.DruidDataSource
+          druid:
+            initial-size: 10 #连接池初始化大小
+            min-idle: 20 #最小空闲连接数
+            max-active: 100 #最大连接数
+            connectTimeout: 600000
+            socketTimeout: 600000
+
+#指定日志配置文件读取路径
+logging:
+  config: classpath:config/logback-spring.xml
+  file:
+    #日志输出路径，结尾需配置/结束
+    name: "D:/log/MyTool"
+  #   name: /applog/dcos/migration/root
+  level:
+    root: info
+
+# 文档迁移线程池配置
+edm-migration:
+  thread-pool:
+    #迁移任务线程池配置
+    migrate:
+      core-pool-size: 20
+      max-pool-size: 20
+      queue-capacity: 10000
+      keep-alive-seconds: 300
+
+# 影像迁移线程池配置
+ecm-migration:
+  thread-pool:
+    #影像迁移任务线程池
+    migrate:
+      core-pool-size: 20
+      max-pool-size: 20
+      queue-capacity: 10000
+      keep-alive-seconds: 300
+    #es线程池配置
+    es:
+      core-pool-size: 40
+      max-pool-size: 40
+      queue-capacity: 10000
+      keep-alive-seconds: 120
+    #文件上传线程池配置
+    upload:
+      core-pool-size: 40
+      max-pool-size: 40
+      queue-capacity: 10000
+      keep-alive-seconds: 120
+      #文件上传多线程任务每轮进入任务数      注意!!!: 影像迁移任务线程池(migrate)的最大线程数×每轮进入任务数<=文件上传线程池(upload)的队列数
+      upload-size: 500
+
+
+
+#全文检索相关配置
+elasticsearch:
+  #文档索引
+  indexName: document
+  #业务索引
+  bizIndex: ecm_busi_dev
+  #文件索引
+  fileIndex: ecm_file_dev
+  #文件流解密临时路径
+  esTempPath: "D:/temp/esTemp/"
+#es连接配置
+easy-es:
+  # 默认为true,若为false时,则认为不启用本框架
+  enable: true
+  #es连接地址
+  address: 172.1.4.143:9200
+  # 连接超时时间 单位:ms
+  connect-timeout: 1000
+  # 通信超时时间 单位:ms
+  socket-timeout: 30000
+  # 连接请求超时时间 单位:ms
+  connection-request-timeout: 500
+  # 最大连接路由数 单位:个
+  max-conn-per-route: 10
+  # 最大连接数 单位:个
+  max-conn-total: 30
+
+
+#默认未知用户id
+unknownUserId: 1921845768289820672
+unknownUserLoginName: "1321"
+unknownUserName: "王晋杰"
+
+#文件存储根路径
+fileRootPath: "E:/EDM/datas/publicfile"
+#ks_xml描述文件根路径
+ksXmlPath: "E:/EDM/datas/contents.info/publicfile"
+#历史版本文件根路径
+versionPath: "E:/EDM/datas/contents.versions/publicfile"
+
+#其他配置
+#-------------------------------文档配置------------------------------------------
+#文档迁移定时任务开关 0:关闭 1:开启
+isEDMMigrate: 0
+#文件存储设备id
+equipmentId: 1689192993912786946
+#迁移文档库id
+houseId: 2005463973144551424
+#机构id
+instId: 2851889946633218
+
+#-------------------------------影像配置------------------------------------------
+#影像迁移定时任务开关 0:关闭 1:开启
+isECMMigrate: 1
+#文件流加密临时路径
+encryptTempPath: "D:/temp/encryptTemp/"
+
+
+
+

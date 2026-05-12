@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsCollectionMapper">
+
+    <select id="searchListExtend" resultType="com.sunyard.edm.dto.DocBsCollectionDTO">
+        SELECT
+        a.*
+        FROM
+        (SELECT
+        c.collection_id,
+        doc.bus_id AS doc_id,
+        doc.doc_name,
+        doc.doc_suffix,
+        doc.type,
+        doc.doc_size,
+        CASE
+        WHEN docg.doc_name IS NULL THEN
+        CASE WHEN doc.type = 0 THEN h.house_name || '/' || doc.doc_name ELSE h.house_name END
+        ELSE
+        CASE WHEN doc.type = 0 THEN h.house_name || '/' || docg.doc_name || '/' || doc.doc_name
+        ELSE h.house_name || '/' || docg.doc_name END
+        END AS folder,
+        doc.doc_owner AS user_id,
+        CASE WHEN doc.type = 0 THEN NULL ELSE doc.doc_owner END AS docOwnerName,
+        doc.update_time,
+        c.create_time AS collection_time,
+        doc.doc_type AS docLibraryType,
+        doc.folder_id AS lastFolderId,
+        doc.house_id AS documentHouseId,
+        doc.is_deleted AS is_deleted,
+        CASE WHEN us.doc_id IS NOT NULL OR doc.doc_type = 1 THEN 1 ELSE 0 END AS isAsh,
+        CASE WHEN doc.recycle_status = 1 THEN 0 ELSE 1 END AS isRecovery,
+        CASE WHEN doc.doc_status = 3 THEN 0 ELSE 1 END AS isNoSelf
+        FROM doc_bs_document doc
+        LEFT JOIN doc_sys_house h ON h.house_id = doc.house_id
+        JOIN doc_bs_collection c ON c.doc_id = doc.bus_id AND c.user_id = #{userId} AND c.is_deleted = 0
+        LEFT JOIN
+        (SELECT
+        t.doc_id,
+        LISTAGG(d.doc_name, '/') WITHIN GROUP (ORDER BY d.folder_level) doc_name
+        FROM doc_bs_document_tree t
+        LEFT JOIN doc_bs_document d ON d.bus_id = t.father_id
+        WHERE
+        doc_id IN
+        <foreach collection="docIdList" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY t.doc_id
+        ) docg ON doc.folder_id = docg.doc_id
+        LEFT JOIN
+        (SELECT
+        DISTINCT doc_id
+        FROM
+        doc_bs_document_user
+        WHERE
+        is_deleted = 0
+        AND rel_id IN
+        <foreach collection="userIdList" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ) us ON us.doc_id = doc.bus_id
+        ) a
+        <if test="tagList != null and tagList.size() != 0">
+            JOIN
+            (SELECT
+            doc_id
+            FROM doc_bs_tag_document
+            WHERE
+            tag_id IN
+            <foreach collection="tagList" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            ) t ON t.doc_id = a.doc_id
+        </if>
+        <where>
+            <if test="docName != null and docName != ''">
+                AND a.doc_name LIKE '%' || #{docName} || '%'
+            </if>
+            <!-- <if test="owner != null and owner != ''">
+                 AND a.docOwnerName LIKE '%' || #{owner} || '%'
+             </if>-->
+            <if test="collectionTimeTo != null and collectionTimeDo != null">
+                AND a.collection_time BETWEEN #{collectionTimeTo} AND #{collectionTimeDo}
+            </if>
+        </where>
+
+        <choose>
+            <when test="collectionTimeSort != null and collectionTimeSort != '' ">
+                <if test="collectionTimeSort == 'ascending'">
+                    ORDER BY a.collection_time ASC
+                </if>
+                <if test="collectionTimeSort == 'descending'">
+                    ORDER BY a.collection_time DESC
+                </if>
+            </when>
+            <when test="updateTimeSort != null and updateTimeSort != '' ">
+                <if test="updateTimeSort == 'ascending'">
+                    ORDER BY a.update_time ASC
+                </if>
+                <if test="updateTimeSort == 'descending'">
+                    ORDER BY a.update_time DESC
+                </if>
+            </when>
+            <otherwise>
+                ORDER BY a.collection_time DESC
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

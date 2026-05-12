@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocSysAnnounUserMapper">
+
+    <select id="searchListHome" resultType="com.sunyard.edm.dto.DocBsHomeDTO">
+        SELECT
+            DISTINCT a.ananoun_id AS id,
+            a.ananoun_title AS content,
+            a.release_time AS time
+        FROM doc_sys_announ_user  u
+            JOIN doc_sys_announ  a ON u.ananoun_id = a.ananoun_id AND a.status = 1
+        WHERE
+            u.is_deleted = 0
+            AND a.is_deleted = 0
+            AND u.rel_id IN
+            <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        ORDER BY a.release_time DESC
+    </select>
+
+</mapper>

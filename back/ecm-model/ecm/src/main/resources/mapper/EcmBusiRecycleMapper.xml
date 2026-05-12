@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmBusiRecycleMapper">
+    <!--todo 代码可以实现-->
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into ecm_busi_recycle(recycle_id, busi_id, busi_no,recycle_user,recycle_time,create_time,update_time)
+        values
+        <foreach collection="list" item="it" separator=",">
+           (#{it.recycleId}, #{it.busiId}, #{it.busiNo},
+            #{it.recycleUser},#{it.recycleTime},
+            #{it.createTime}, #{it.updateTime})
+        </foreach>
+    </insert>
+
+    <!-- todo 挪位置-->
+    <select id="selectBusiRecycleList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiRecycleInfoDTO">
+        SELECT
+            info.busi_id,
+            info.busi_no,
+            info.app_code,
+            info.right_ver,
+            info.tree_type,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name,
+            recycle.recycle_id,
+            recycle.recycle_user,
+            recycle.recycle_time
+        FROM ecm_busi_info  info
+            LEFT JOIN ecm_busi_recycle  recycle ON info.busi_id = recycle.busi_id
+        <where>
+            info.is_deleted = 1
+            <if test="searchVO.busiNo != null and searchVO.busiNo != ''">
+                AND info.busi_no LIKE CONCAT('%',#{searchVO.busiNo}, '%')
+            </if>
+            <if test="searchVO.orgCode != null and searchVO.orgCode != ''">
+                AND info.org_code LIKE CONCAT('%',#{searchVO.orgCode}, '%')
+            </if>
+            <if test="searchVO.rightVer != null and searchVO.rightVer != ''">
+                AND info.right_ver =  #{searchVO.rightVer}
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND info.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="searchVO.createUser != null and searchVO.createUser != ''">
+                AND info.create_user_name LIKE CONCAT('%',#{searchVO.createUser},'%')
+            </if>
+            <if test="searchVO.createTimeStart != null and searchVO.createTimeEnd != ''">
+                AND info.create_time &gt;= #{searchVO.createTimeStart}
+                AND info.create_time &lt;= #{searchVO.createTimeEnd}
+            </if>
+            <if test="searchVO.deleteTimeStart != null and searchVO.deleteTimeEnd != ''">
+                AND recycle.recycle_time &gt;=  #{searchVO.deleteTimeStart}
+                AND recycle.recycle_time &lt;= #{searchVO.deleteTimeEnd}
+            </if>
+        </where>
+        ORDER BY recycle.recycle_time DESC
+    </select>
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertBatch" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_busi_recycle(recycle_id, busi_id, busi_no,recycle_user,recycle_time,create_time,update_time)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{it.recycleId}, #{it.busiId}, #{it.busiNo},
+            #{it.recycleUser},#{it.recycleTime},
+            #{it.createTime}, #{it.updateTime}
+            from dual)
+        </foreach>
+    </insert>
+
+    <select id="selectBusiRecycleList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiRecycleInfoDTO" databaseId="oracle">
+        select
+        info.busi_id,
+        info.busi_no,
+        info.app_code,
+        info.right_ver,
+        info.tree_type,
+        info.create_user,
+        info.create_time,
+        info.update_user,
+        info.update_time,
+        info.is_deleted,
+        info.create_user_name,
+        info.update_user_name,
+        info.org_code,
+        info.org_name,
+        recycle.recycle_id,
+        recycle.recycle_user,
+        recycle.recycle_time
+        from
+        ecm_busi_info info
+        left join ecm_busi_recycle recycle on info.busi_id = recycle.busi_id
+        <where>
+            info.is_deleted = 1
+            <if test="searchVO.busiNo != null and searchVO.busiNo != ''">
+                and info.busi_no like CONCAT(CONCAT('%',#{searchVO.busiNo}),'%')
+            </if>
+            <if test="searchVO.orgCode != null and searchVO.orgCode != ''">
+                and info.org_code like CONCAT(CONCAT('%',#{searchVO.orgCode}),'%')
+            </if>
+            <if test="searchVO.rightVer != null and searchVO.rightVer != ''">
+                and info.right_ver =  #{searchVO.rightVer}
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                and info.app_code in
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                and info.busi_id in
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="searchVO.createUser != null and searchVO.createUser != ''">
+                and info.create_user_name like CONCAT(CONCAT('%',#{searchVO.createUser}),'%')
+            </if>
+<!--            <if test="searchVO.createTimeStart != null and searchVO.createTimeEnd != ''">-->
+<!--                and info.create_time &gt;= #{searchVO.createTimeStart}-->
+<!--                and info.create_time &lt;= #{searchVO.createTimeEnd}-->
+<!--            </if>-->
+<!--            <if test="searchVO.deleteTimeStart != null and searchVO.deleteTimeEnd != ''">-->
+<!--                and recycle.recycle_time &gt;=  #{searchVO.deleteTimeStart}-->
+<!--                and recycle.recycle_time &lt;= #{searchVO.deleteTimeEnd}-->
+<!--            </if>-->
+            <!-- 修改点 1: 创建时间范围 -->
+            <if test="searchVO.createTimeStart != null and searchVO.createTimeEnd != ''">
+                and info.create_time &gt;= TO_DATE(#{searchVO.createTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                and info.create_time &lt;= TO_DATE(#{searchVO.createTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+
+            <!-- 修改点 2: 回收/删除时间范围 -->
+            <if test="searchVO.deleteTimeStart != null and searchVO.deleteTimeEnd != ''">
+                and recycle.recycle_time &gt;= TO_DATE(#{searchVO.deleteTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                and recycle.recycle_time &lt;= TO_DATE(#{searchVO.deleteTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+        </where>
+        ORDER BY recycle.recycle_time DESC
+    </select>
+</mapper>

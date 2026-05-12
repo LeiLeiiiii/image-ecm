@@ -1,0 +1,1196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmBusiInfoMapper">
+
+    <!--todo 代码可以实现-->
+<!--    <select id="selecAppTypetList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO">-->
+<!--        SELECT-->
+<!--            info.busi_id-->
+<!--        FROM ecm_busi_info info-->
+<!--        <where>-->
+<!--            info.is_deleted = 0-->
+<!--            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">-->
+<!--                AND info.busi_no LIKE CONCAT('%',#{busiInfoVo.busiNo}, '%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">-->
+<!--                AND info.right_ver =  #{busiInfoVo.rightVer}-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.status != null and busiInfoVo.status.size() > 0">-->
+<!--                AND info.status IN-->
+<!--                <foreach collection="busiInfoVo.status" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="appCodeList != null and appCodeList.size() > 0 ">-->
+<!--                AND info.app_code IN-->
+<!--                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="orgCodeList != null and orgCodeList.size() > 0 ">-->
+<!--                AND info.org_code IN-->
+<!--                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="busiIds != null and busiIds.size() > 0">-->
+<!--                AND info.busi_id IN-->
+<!--                <foreach collection="busiIds" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">-->
+<!--                AND info.create_user_name LIKE CONCAT('%',#{busiInfoVo.createUser},'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">-->
+<!--                AND info.update_user_name LIKE CONCAT('%',#{busiInfoVo.updateUser},'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeEnd != ''">-->
+<!--                AND info.create_time &gt;= #{busiInfoVo.createTimeStart}-->
+<!--                AND info.create_time &lt;= #{busiInfoVo.createTimeEnd}-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeEnd != ''">-->
+<!--                AND info.update_time &gt;=  #{busiInfoVo.updateTimeStart}-->
+<!--                AND info.update_time &lt;= #{busiInfoVo.updateTimeEnd}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        ORDER BY info.create_time DESC-->
+<!--&#45;&#45;         LIMIT #{size},#{pageSize}-->
+<!--    </select>-->
+
+<!--    <select id="selecBusiStatusList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiStatusDTO">-->
+<!--        SELECT-->
+<!--        info.status,-->
+<!--        COUNT(*) AS busiNum-->
+<!--        FROM ecm_busi_info info-->
+<!--        <where>-->
+<!--            info.is_deleted = 0-->
+<!--            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">-->
+<!--                AND info.busi_no LIKE CONCAT('%',#{busiInfoVo.busiNo}, '%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">-->
+<!--                AND (-->
+<!--                <foreach collection="busiInfoVo.orgCodes" item="code" separator="OR">-->
+<!--                    info.org_code LIKE CONCAT('%', #{code}, '%')-->
+<!--                </foreach>-->
+<!--                )-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">-->
+<!--                AND info.right_ver =  #{busiInfoVo.rightVer}-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.status != null and busiInfoVo.status.size() > 0">-->
+<!--                AND info.status IN-->
+<!--                <foreach collection="busiInfoVo.status" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="appCodeList != null and appCodeList.size() > 0 ">-->
+<!--                AND info.app_code IN-->
+<!--                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="orgCodeList != null and orgCodeList.size() > 0 ">-->
+<!--                AND info.org_code IN-->
+<!--                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="busiIds != null and busiIds.size() > 0">-->
+<!--                AND info.busi_id IN-->
+<!--                <foreach collection="busiIds" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">-->
+<!--                AND info.create_user_name LIKE CONCAT('%',#{busiInfoVo.createUser},'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">-->
+<!--                AND info.update_user_name LIKE CONCAT('%',#{busiInfoVo.updateUser},'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeEnd != ''">-->
+<!--                AND info.create_time &gt;= #{busiInfoVo.createTimeStart}-->
+<!--                AND info.create_time &lt;= #{busiInfoVo.createTimeEnd}-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeEnd != ''">-->
+<!--                AND info.update_time &gt;=  #{busiInfoVo.updateTimeStart}-->
+<!--                AND info.update_time &lt;= #{busiInfoVo.updateTimeEnd}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--        GROUP BY info.status-->
+<!--    </select>-->
+
+    <select id="selecBusiStatusList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiStatusDTO">
+        SELECT
+        info.status,
+        COUNT(*) AS busiNum
+        FROM ecm_busi_info info
+        <where>
+            info.is_deleted = 0
+
+            <!-- 业务编号：修复 CONCAT 3参数问题 -->
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                AND info.busi_no LIKE '%' || #{busiInfoVo.busiNo} || '%'
+            </if>
+
+            <!-- 机构号列表：修复 OR 缺少空格问题 + CONCAT 问题 -->
+            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">
+                AND (
+                <foreach collection="busiInfoVo.orgCodes" item="code" separator=" OR ">
+                    info.org_code LIKE '%' || #{code} || '%'
+                </foreach>
+                )
+            </if>
+
+            <!-- 版本号 -->
+            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">
+                AND info.right_ver = #{busiInfoVo.rightVer}
+            </if>
+
+            <!-- 状态列表 -->
+            <if test="busiInfoVo.status != null and busiInfoVo.status.size() > 0">
+                AND info.status IN
+                <foreach collection="busiInfoVo.status" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <!-- 应用代码列表 -->
+            <if test="appCodeList != null and appCodeList.size() > 0">
+                AND info.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <!-- 机构代码列表 (精确匹配) -->
+            <if test="orgCodeList != null and orgCodeList.size() > 0">
+                AND info.org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <!-- 业务ID列表 -->
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <!-- 创建人：修复 CONCAT 问题 -->
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                AND info.create_user_name LIKE '%' || #{busiInfoVo.createUser} || '%'
+            </if>
+
+            <!-- 更新人：修复 CONCAT 问题 -->
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                AND info.update_user_name LIKE '%' || #{busiInfoVo.updateUser} || '%'
+            </if>
+
+            <!-- 创建时间：修复判断逻辑 (Start 和 End 都要判非空) -->
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeStart != '' and busiInfoVo.createTimeEnd != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= TO_DATE(#{busiInfoVo.createTimeStart}, 'yyyy-MM-dd HH24:mi:ss')
+                AND info.create_time &lt;= TO_DATE(#{busiInfoVo.createTimeEnd}, 'yyyy-MM-dd HH24:mi:ss')
+            </if>
+
+            <!-- 更新时间：修复判断逻辑 (Start 和 End 都要判非空) -->
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeStart != '' and busiInfoVo.updateTimeEnd != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= TO_DATE(#{busiInfoVo.updateTimeStart}, 'yyyy-MM-dd HH24:mi:ss')
+                AND info.update_time &lt;= TO_DATE(#{busiInfoVo.updateTimeEnd}, 'yyyy-MM-dd HH24:mi:ss')
+            </if>
+        </where>
+        GROUP BY info.status
+    </select>
+
+    <select id="selectWithAppTypeById" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO">
+        SELECT
+            info.busi_id,
+            info.busi_no,
+            info.app_code,
+            info.right_ver,
+            info.tree_type,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name,
+            app.app_name AS appTypeName,
+            app.equipment_id
+        FROM ecm_busi_info  info
+            LEFT JOIN ecm_app_def  app ON info.app_code = app.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiId != null">
+               AND info.busi_id = #{busiId}
+            </if>
+        </where>
+    </select>
+
+    <!--TODO 和上面是不是可以公用-->
+    <select id="selectWithAppType" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO">
+        select
+            info.busi_id,
+            info.busi_no,
+            info.app_code,
+            info.right_ver,
+            info.tree_type,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name,
+            app.app_name AS appTypeName,
+            app.equipment_id
+        from ecm_busi_info  info
+            LEFT JOIN ecm_app_def app ON info.app_code = app.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiNo != null and busiNo != ''">
+                AND info.busi_no = #{busiNo}
+            </if>
+            <if test="appCode != null and appCode != ''">
+                AND info.app_code = #{appCode}
+            </if>
+        </where>
+    </select>
+    <!--TODO 和上面是不是可以公用-->
+    <select id="selectWithAppTypeList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO">
+        SELECT
+            info.busi_id,
+            info.busi_no,
+            info.app_code,
+            info.right_ver,
+            info.tree_type,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name,
+            app.app_name AS appTypeName,
+            app.equipment_id
+        FROM ecm_busi_info  info
+            LEFT JOIN ecm_app_def app AS on info.app_code = app.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selecAppTypetList2" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO">
+        SELECT
+            info.busi_id,
+            info.busi_no,
+            info.create_user_name,
+            def.app_name AS appTypeName,
+            info.create_time,
+            def.app_code
+        FROM ecm_busi_info  info
+            LEFT JOIN ecm_app_def  def ON info.app_code = def.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                AND info.busi_no LIKE CONCAT('%',#{busiInfoVo.busiNo}, '%')
+            </if>
+            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">
+                AND (
+                <foreach collection="busiInfoVo.orgCodes" item="code" separator="OR">
+                    info.org_code LIKE CONCAT('%', #{code}, '%')
+                </foreach>
+                )
+            </if>
+            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">
+                AND info.right_ver =  #{busiInfoVo.rightVer}
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND info.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                AND info.create_user_name LIKE CONCAT('%',#{busiInfoVo.createUser},'%')
+            </if>
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                AND info.update_user_name LIKE CONCAT('%',#{busiInfoVo.updateUser},'%')
+            </if>
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= #{busiInfoVo.createTimeStart}
+                AND info.create_time &lt;= #{busiInfoVo.createTimeEnd}
+            </if>
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;=  #{busiInfoVo.updateTimeStart}
+                AND info.update_time &lt;= #{busiInfoVo.updateTimeEnd}
+            </if>
+        </where>
+        ORDER BY info.create_time DESC
+    </select>
+    <!--TODO 代码可以实现-->
+    <select id="selectCountAll" resultType="long">
+        SELECT
+            count(info.busi_id)
+        FROM ecm_busi_info  info
+        <where>
+            <if test="rightVer != null and rightVer != ''">
+                AND info.right_ver = #{rightVer}
+            </if>
+            <if test="appCode != null and appCode != ''">
+                AND info.app_code = #{appCode}
+            </if>
+        </where>
+    </select>
+
+    <select id="selecetAppTypetListCounts" resultType="long">
+        SELECT
+            count(*)
+        FROM ecm_busi_info  info
+            LEFT JOIN ecm_app_def  def ON info.app_code = def.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                AND info.busi_no LIKE CONCAT('%',#{busiInfoVo.busiNo}, '%')
+            </if>
+            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">
+                AND (
+                <foreach collection="busiInfoVo.orgCodes" item="code" separator="OR">
+                    info.org_code LIKE CONCAT('%', #{code}, '%')
+                </foreach>
+                )
+            </if>
+            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">
+                AND info.right_ver = #{busiInfoVo.rightVer}
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND info.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                AND info.create_user_name LIKE CONCAT('%',#{busiInfoVo.createUser},'%')
+            </if>
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                AND info.update_user_name LIKE CONCAT('%',#{busiInfoVo.updateUser},'%')
+            </if>
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= #{busiInfoVo.createTimeStart}
+                AND info.create_time &lt;= #{busiInfoVo.createTimeEnd}
+            </if>
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= #{busiInfoVo.updateTimeStart}
+                AND info.update_time &lt;= #{busiInfoVo.updateTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!--TODO 代码可以实现-->
+    <select id="selectQueryDataList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO">
+        SELECT
+            info.busi_id,
+            info.busi_no,
+            info.app_code,
+            info.right_ver,
+            info.tree_type,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name,
+            info.status,
+            info.err_no,
+            info.remark
+        FROM ecm_busi_info  info
+        WHERE
+            info.busi_id IN
+        <foreach collection="busiIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY info.create_time DESC
+    </select>
+
+    <!--TODO 代码可以实现 存在concat函数，需要考虑数据库适配适配-->
+    <select id="selecAppTypetCount" resultType="long">
+        SELECT
+            count(*)
+        FROM ecm_busi_info  info
+        <where>
+            info.is_deleted = 0
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                AND info.busi_no LIKE CONCAT('%',#{busiInfoVo.busiNo}, '%')
+            </if>
+            <if test="busiInfoVo.status != null and busiInfoVo.status.size() > 0">
+                AND info.status IN
+                <foreach collection="busiInfoVo.status" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND info.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND info.org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                AND info.create_user_name LIKE CONCAT('%',#{busiInfoVo.createUser}, '%')
+            </if>
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                AND info.update_user_name LIKE CONCAT('%',#{busiInfoVo.updateUser}, '%')
+            </if>
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= #{busiInfoVo.createTimeStart}
+                AND info.create_time &lt;= #{busiInfoVo.createTimeEnd}
+            </if>
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= #{busiInfoVo.updateTimeStart}
+                AND info.update_time &lt;= #{busiInfoVo.updateTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <!--TODO 代码可以实现-->
+    <select id="selectByIdWithDeleted" parameterType="java.lang.Long" resultType="com.sunyard.ecm.po.EcmBusiInfo">
+        SELECT
+            *
+        FROM ecm_busi_info
+        WHERE
+            busi_id = #{busiId}
+    </select>
+
+    <!--TODO 代码可以实现-->
+    <update id="updateBatchById">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE ecm_busi_info
+            SET
+                busi_no=#{item.busiNo} ,
+                is_deleted = 1
+            WHERE
+                busi_id=#{item.busiId}
+        </foreach>
+    </update>
+
+    <update id="updateByIdWithNoDeleted" parameterType="com.sunyard.ecm.po.EcmBusiInfo">
+        update ecm_busi_info
+        set busi_no=#{busiInfo.busiNo}, is_deleted = 0
+        where busi_id=#{busiInfo.busiId}
+    </update>
+
+    <delete id="deleteByBusiId" parameterType="java.lang.Long">
+        delete from ecm_busi_info
+        where busi_id = #{busiId}
+    </delete>
+
+    <delete id="deleteBatchByBusiId" parameterType="java.util.Collection">
+        delete from ecm_busi_info
+        where busi_id in
+        <foreach collection="coll" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectUploadNum" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmWorkStatisticsDTO">
+        SELECT
+        ebi.app_code AS appCode,
+        efi.create_user AS createUser,
+        efi.create_user_name AS createUserName,
+        DATE_FORMAT(efi.create_time,
+        <choose>
+            <when test="ecmStatisticsDTO.unit == 0">
+                '%Y-%m-%d'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 1">
+                '%Y-%m'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 2">
+                '%Y'
+            </when>
+            <otherwise>
+                '%Y-%m-%d'
+            </otherwise>
+        </choose>
+        ) AS createDate,
+        COUNT(*) AS fileNumber
+        FROM
+        ecm_busi_info ebi
+        LEFT JOIN ecm_file_info efi ON ebi.busi_id = efi.busi_id
+        <where>
+            efi.create_time BETWEEN #{ecmStatisticsDTO.startDate} AND #{ecmStatisticsDTO.endDate}
+            <if test="ecmStatisticsDTO.mapList != null and ecmStatisticsDTO.mapList.size() > 0">
+                AND  efi.create_user IN
+                <foreach collection="ecmStatisticsDTO.mapList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+        </where>
+        GROUP BY
+        efi.create_user,
+        DATE_FORMAT(efi.create_time,
+        <choose>
+            <when test="ecmStatisticsDTO.unit == 0">
+                '%Y-%m-%d'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 1">
+                '%Y-%m'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 2">
+                '%Y'
+            </when>
+            <otherwise>
+                '%Y-%m-%d'
+            </otherwise>
+        </choose>
+        ),
+        efi.create_user_name,
+        ebi.app_code
+    </select>
+
+    <select id="selectListInRecycle" parameterType="java.lang.String" resultType="java.lang.String">
+        select app_code as appCode from ecm_busi_info
+        where busi_id in (SELECT busi_id from ecm_busi_recycle)
+        and app_code=#{appCode}
+    </select>
+
+    <select id="selectListForDestroy" resultType="com.sunyard.ecm.dto.ecm.EcmDestroyListDTO">
+        SELECT
+            info.busi_id,
+            info.busi_no,
+            info.app_code,
+            f.doc_code,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name
+        FROM ecm_busi_info info
+        LEFT JOIN ecm_file_info f ON f.busi_id = info.busi_id
+        <where>
+            info.is_deleted = 0 AND f.is_deleted = 0
+
+            <if test="createTimeStart != null and createTimeEnd != ''">
+                AND info.create_time &gt;= TO_DATE(#{createTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                AND info.create_time &lt;= TO_DATE(#{createTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+
+            <if test="orgCode != null and orgCode != ''">
+                AND info.org_code LIKE '%' || #{orgCode} || '%'
+            </if>
+
+            <if test="busiNo != null and busiNo != ''">
+                AND info.busi_no = #{busiNo}
+            </if>
+
+            <if test="docCode != null and docCode != ''">
+                AND f.doc_code = #{docCode}
+            </if>
+
+            <if test="state != null and state != ''">
+                AND f.state = #{state}
+            </if>
+        </where>
+        GROUP BY info.busi_id,
+            info.busi_no,
+            info.app_code,
+            f.doc_code,
+            info.create_user,
+            info.create_time,
+            info.update_user,
+            info.update_time,
+            info.is_deleted,
+            info.create_user_name,
+            info.update_user_name,
+            info.org_code,
+            info.org_name
+        ORDER BY info.create_time ASC
+    </select>
+
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+<!--  limit  todo-->
+    <select id="selecAppTypetList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO" databaseId="oracle">
+        SELECT
+        info.busi_id
+        FROM
+        ecm_busi_info info
+        <where>
+            info.is_deleted = 0
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                <!-- 建议：Oracle 中推荐使用 || 拼接，CONCAT 只能接两个参数，嵌套容易出错且性能稍差 -->
+                and info.busi_no like '%' || #{busiInfoVo.busiNo} || '%'
+            </if>
+            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">
+                and info.right_ver = #{busiInfoVo.rightVer}
+            </if>
+            <if test="busiInfoVo.status != null and busiInfoVo.status.size() > 0">
+                AND info.status IN
+                <foreach collection="busiInfoVo.status" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                and info.app_code in
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND info.org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                and info.busi_id in
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                and info.create_user_name like '%' || #{busiInfoVo.createUser} || '%'
+            </if>
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                and info.update_user_name like '%' || #{busiInfoVo.updateUser} || '%'
+            </if>
+
+            <!-- ✅ 修复点 1: 补全 null 和 '' 的判断 -->
+            <!-- ✅ 修复点 2: 增加 TO_DATE 转换，假设格式为 yyyy-MM-dd HH:mm:ss -->
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeStart != ''
+                  and busiInfoVo.createTimeEnd != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= TO_DATE(#{busiInfoVo.createTimeStart}, 'yyyy-MM-dd HH24:mi:ss')
+                AND info.create_time &lt;= TO_DATE(#{busiInfoVo.createTimeEnd}, 'yyyy-MM-dd HH24:mi:ss')
+            </if>
+
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeStart != ''
+                  and busiInfoVo.updateTimeEnd != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= TO_DATE(#{busiInfoVo.updateTimeStart}, 'yyyy-MM-dd HH24:mi:ss')
+                AND info.update_time &lt;= TO_DATE(#{busiInfoVo.updateTimeEnd}, 'yyyy-MM-dd HH24:mi:ss')
+            </if>
+        </where>
+        ORDER BY info.create_time DESC
+    </select>
+
+    <select id="selecAppTypetList2" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO" databaseId="oracle">
+        SELECT
+        info.busi_id,
+        info.busi_no,
+        info.create_user_name,
+        def.app_name as appTypeName,
+        info.create_time,
+        def.app_code
+        FROM
+        ecm_busi_info info
+        left join  ecm_app_def def on  info.app_code = def.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                and info.busi_no like CONCAT(CONCAT('%',#{busiInfoVo.busiNo}),'%')
+            </if>
+            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">
+                AND (
+                <foreach collection="busiInfoVo.orgCodes" item="code" separator="OR">
+                    info.org_code LIKE CONCAT('%', #{code}, '%')
+                </foreach>
+                )
+            </if>
+            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">
+                and info.right_ver =  #{busiInfoVo.rightVer}
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                and info.app_code in
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiIds != null and busiIds.size() > 0">
+                and info.busi_id in
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                and info.create_user_name like CONCAT(CONCAT('%',#{busiInfoVo.createUser}),'%')
+            </if>
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                and info.update_user_name  like CONCAT(CONCAT('%',#{busiInfoVo.updateUser}),'%')
+            </if>
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeStart != '' and busiInfoVo.createTimeEnd != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= TO_DATE(#{busiInfoVo.createTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                AND info.create_time &lt;= TO_DATE(#{busiInfoVo.createTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeStart != '' and busiInfoVo.updateTimeEnd != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= TO_DATE(#{busiInfoVo.updateTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                AND info.update_time &lt;= TO_DATE(#{busiInfoVo.updateTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+        </where>
+        ORDER BY info.create_time DESC
+    </select>
+<!--    <select id="selectCountAll" resultType="long" databaseId="oracle">-->
+<!--        SELECT-->
+<!--        count(info.busi_id)-->
+<!--        FROM-->
+<!--        ecm_busi_info info-->
+<!--        <where>-->
+<!--            <if test="rightVer != null and rightVer != ''">-->
+<!--                and info.right_ver = #{rightVer}-->
+<!--            </if>-->
+<!--            <if test="appCode != null and appCode != ''">-->
+<!--                and info.app_code = #{appCode}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+<!--    <select id="selecetAppTypetListCounts" resultType="long" databaseId="oracle">-->
+<!--        SELECT-->
+<!--        count(*)-->
+<!--        FROM-->
+<!--        ecm_busi_info info-->
+<!--        left join ecm_app_def def on info.app_code = def.app_code-->
+<!--        <where>-->
+<!--            info.is_deleted = 0-->
+<!--            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">-->
+<!--                and info.busi_no like CONCAT(CONCAT('%',#{busiInfoVo.busiNo}),'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">-->
+<!--                AND (-->
+<!--                <foreach collection="busiInfoVo.orgCodes" item="code" separator=" OR ">-->
+<!--                    info.org_code LIKE CONCAT('%', #{code}, '%')-->
+<!--                </foreach>-->
+<!--                )-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">-->
+<!--                and info.right_ver = #{busiInfoVo.rightVer}-->
+<!--            </if>-->
+<!--            <if test="appCodeList != null and appCodeList.size() > 0 ">-->
+<!--                and info.app_code in-->
+<!--                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="busiIds != null and busiIds.size() > 0">-->
+<!--                and info.busi_id in-->
+<!--                <foreach collection="busiIds" item="item" open="(" separator="," close=")">-->
+<!--                    #{item}-->
+<!--                </foreach>-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">-->
+<!--                and info.create_user_name like CONCAT(CONCAT('%',#{busiInfoVo.createUser}),'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">-->
+<!--                and info.update_user_name like CONCAT(CONCAT('%',#{busiInfoVo.updateUser}),'%')-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeEnd != ''">-->
+<!--                AND info.create_time &gt;= #{busiInfoVo.createTimeStart}-->
+<!--                AND info.create_time &lt;= #{busiInfoVo.createTimeEnd}-->
+<!--            </if>-->
+<!--            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeEnd != ''">-->
+<!--                and info.update_time &gt;= #{busiInfoVo.updateTimeStart}-->
+<!--                and info.update_time &lt;= #{busiInfoVo.updateTimeEnd}-->
+<!--            </if>-->
+<!--        </where>-->
+<!--    </select>-->
+
+    <!-- 这个 SQL 本身没有问题，保持不变 -->
+    <select id="selectCountAll" resultType="long" databaseId="oracle">
+        SELECT count(info.busi_id)
+        FROM ecm_busi_info info
+        <where>
+            <if test="rightVer != null and rightVer != ''">
+                AND info.right_ver = #{rightVer}
+            </if>
+            <if test="appCode != null and appCode != ''">
+                AND info.app_code = #{appCode}
+            </if>
+        </where>
+    </select>
+
+    <!-- 这个 SQL 进行了全面修复 -->
+    <select id="selecetAppTypetListCounts" resultType="long" databaseId="oracle">
+        SELECT count(*)
+        FROM ecm_busi_info info
+        LEFT JOIN ecm_app_def def ON info.app_code = def.app_code
+        <where>
+            info.is_deleted = 0
+
+            <!-- 业务编号：修复 CONCAT 嵌套问题，改用 || -->
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                AND info.busi_no LIKE '%' || #{busiInfoVo.busiNo} || '%'
+            </if>
+
+            <!-- 机构号列表：修复 OR 空格问题 + CONCAT 问题 -->
+            <if test="busiInfoVo.orgCodes != null and busiInfoVo.orgCodes.size() > 0">
+                AND (
+                <foreach collection="busiInfoVo.orgCodes" item="code" separator=" OR ">
+                    info.org_code LIKE '%' || #{code} || '%'
+                </foreach>
+                )
+            </if>
+
+            <!-- 版本号 -->
+            <if test="busiInfoVo.rightVer != null and busiInfoVo.rightVer != ''">
+                AND info.right_ver = #{busiInfoVo.rightVer}
+            </if>
+
+            <!-- 应用代码列表 -->
+            <if test="appCodeList != null and appCodeList.size() > 0">
+                AND info.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <!-- 业务ID列表 -->
+            <if test="busiIds != null and busiIds.size() > 0">
+                AND info.busi_id IN
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <!-- 创建人：修复 CONCAT 嵌套问题 -->
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                AND info.create_user_name LIKE '%' || #{busiInfoVo.createUser} || '%'
+            </if>
+
+            <!-- 更新人：修复 CONCAT 嵌套问题 -->
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                AND info.update_user_name LIKE '%' || #{busiInfoVo.updateUser} || '%'
+            </if>
+
+            <!-- 创建时间：增加 TO_DATE 显式转换 -->
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeStart != '' and busiInfoVo.createTimeEnd != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= TO_DATE(#{busiInfoVo.createTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                AND info.create_time &lt;= TO_DATE(#{busiInfoVo.createTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+
+            <!-- 更新时间：增加 TO_DATE 显式转换 -->
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeStart != '' and busiInfoVo.updateTimeEnd != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= TO_DATE(#{busiInfoVo.updateTimeStart}, 'YYYY-MM-DD HH24:MI:SS')
+                AND info.update_time &lt;= TO_DATE(#{busiInfoVo.updateTimeEnd}, 'YYYY-MM-DD HH24:MI:SS')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectQueryDataList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO" databaseId="oracle">
+        SELECT
+        info.busi_id,
+        info.busi_no,
+        info.app_code,
+        info.right_ver,
+        info.tree_type,
+        info.create_user,
+        info.create_time,
+        info.update_user,
+        info.update_time,
+        info.is_deleted,
+        info.create_user_name,
+        info.update_user_name,
+        info.org_code,
+        info.org_name,
+        info.status,
+        info.err_no,
+        info.remark
+        FROM
+        ecm_busi_info info
+        where
+        info.busi_id in
+        <foreach collection="busiIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY info.create_time DESC
+    </select>
+
+    <select id="selecAppTypetCount" resultType="long" databaseId="oracle">
+        SELECT count(*) FROM ecm_busi_info info
+        <where>
+            info.is_deleted = 0
+
+            <if test="busiInfoVo.busiNo != null and busiInfoVo.busiNo != ''">
+                <!-- 优化：使用 || 拼接，比嵌套 CONCAT 更清晰且性能更好 -->
+                and info.busi_no like '%' || #{busiInfoVo.busiNo} || '%'
+            </if>
+            <if test="busiInfoVo.status != null and busiInfoVo.status.size() > 0">
+                AND info.status IN
+                <foreach collection="busiInfoVo.status" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                and info.app_code in
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND info.org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="busiIds != null and busiIds.size() > 0">
+                and info.busi_id in
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="busiInfoVo.createUser != null and busiInfoVo.createUser != ''">
+                and info.create_user_name like '%' || #{busiInfoVo.createUser} || '%'
+            </if>
+
+            <if test="busiInfoVo.updateUser != null and busiInfoVo.updateUser != ''">
+                and info.update_user_name like '%' || #{busiInfoVo.updateUser} || '%'
+            </if>
+
+            <!-- ✅ 修复点 1: 补全 startTime 的 null 和 '' 判断 -->
+            <!-- ✅ 修复点 2: 增加 TO_DATE 显式转换 (格式需与前端传入一致) -->
+            <if test="busiInfoVo.createTimeStart != null and busiInfoVo.createTimeStart != ''
+                  and busiInfoVo.createTimeEnd != null and busiInfoVo.createTimeEnd != ''">
+                AND info.create_time &gt;= TO_DATE(#{busiInfoVo.createTimeStart}, 'yyyy-MM-dd HH24:mi:ss')
+                AND info.create_time &lt;= TO_DATE(#{busiInfoVo.createTimeEnd}, 'yyyy-MM-dd HH24:mi:ss')
+            </if>
+
+            <if test="busiInfoVo.updateTimeStart != null and busiInfoVo.updateTimeStart != ''
+                  and busiInfoVo.updateTimeEnd != null and busiInfoVo.updateTimeEnd != ''">
+                AND info.update_time &gt;= TO_DATE(#{busiInfoVo.updateTimeStart}, 'yyyy-MM-dd HH24:mi:ss')
+                AND info.update_time &lt;= TO_DATE(#{busiInfoVo.updateTimeEnd}, 'yyyy-MM-dd HH24:mi:ss')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByIdWithDeleted" parameterType="java.lang.Long" resultType="com.sunyard.ecm.po.EcmBusiInfo" databaseId="oracle">
+        select * from ecm_busi_info
+        where busi_id = #{busiId}
+    </select>
+
+    <update id="updateBatchById" databaseId="oracle">
+        <foreach collection="list" item="item" separator=";">
+            update ecm_busi_info set busi_no=#{item.busiNo} , is_deleted = 1 where busi_id=#{item.busiId}
+        </foreach>
+    </update>
+
+    <update id="updateByIdWithNoDeleted" parameterType="com.sunyard.ecm.po.EcmBusiInfo" databaseId="oracle">
+        update ecm_busi_info
+        set busi_no=#{busiInfo.busiNo}, is_deleted = 0
+        where busi_id=#{busiInfo.busiId}
+    </update>
+
+    <delete id="deleteByBusiId" parameterType="java.lang.Long" databaseId="oracle">
+        delete from ecm_busi_info
+        where busi_id = #{busiId}
+    </delete>
+
+    <delete id="deleteBatchByBusiId" parameterType="java.util.Collection" databaseId="oracle">
+        delete from ecm_busi_info
+        where busi_id in
+        <foreach collection="coll" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+<!--TODO oracle TO_CHAR和 mysql DATE_FORMAT-->
+    <select id="selectUploadNum" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmWorkStatisticsDTO" databaseId="oracle">
+        SELECT
+        ebi.app_code AS appCode,
+        efi.create_user AS createUser,
+        efi.create_user_name AS createUserName,
+        TO_CHAR(efi.create_time,
+--         DATE_FORMAT(efi.create_time,
+        <choose>
+            <when test="ecmStatisticsDTO.unit == 0">
+                'YYYY-MM-DD'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 1">
+                'YYYY-MM'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 2">
+                'YYYY'
+            </when>
+            <otherwise>
+                'YYYY-MM-DD'
+            </otherwise>
+        </choose>
+        ) AS createDate,
+        COUNT(*) AS fileNumber
+        FROM
+        ecm_busi_info ebi
+        LEFT JOIN ecm_file_info efi ON ebi.busi_id = efi.busi_id
+        <where>
+            efi.create_time BETWEEN #{ecmStatisticsDTO.startDate} AND #{ecmStatisticsDTO.endDate}
+            <if test="ecmStatisticsDTO.mapList != null and ecmStatisticsDTO.mapList.size() > 0">
+                AND  efi.create_user IN
+                <foreach collection="ecmStatisticsDTO.mapList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+        </where>
+        GROUP BY
+        efi.create_user,
+        TO_CHAR(efi.create_time,
+        <choose>
+            <when test="ecmStatisticsDTO.unit == 0">
+                'YYYY-MM-DD'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 1">
+                'YYYY-MM'
+            </when>
+            <when test="ecmStatisticsDTO.unit == 2">
+                'YYYY'
+            </when>
+            <otherwise>
+                'YYYY-MM-DD'
+            </otherwise>
+        </choose>
+        ),
+        efi.create_user_name,
+        ebi.app_code
+    </select>
+    <select id="selectListInRecycle" parameterType="java.lang.String" resultType="java.lang.String" databaseId="oracle">
+        select app_code as appCode from ecm_busi_info
+        where busi_id in (SELECT busi_id from ecm_busi_recycle)
+        and app_code=#{appCode}
+    </select>
+
+    <select id="selectWithAppTypeById" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO" databaseId="oracle">
+        select
+        info.busi_id,
+        info.busi_no,
+        info.app_code,
+        info.right_ver,
+        info.tree_type,
+        info.create_user,
+        info.create_time,
+        info.update_user,
+        info.update_time,
+        info.is_deleted,
+        info.create_user_name,
+        info.update_user_name,
+        info.org_code,
+        info.org_name,
+        app.app_name as appTypeName,
+        app.equipment_id
+        from
+        ecm_busi_info info
+        left join  ecm_app_def app on info.app_code = app.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiId != null">
+                and info.busi_id = #{busiId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectWithAppType" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO" databaseId="oracle">
+        select
+        info.busi_id,
+        info.busi_no,
+        info.app_code,
+        info.right_ver,
+        info.tree_type,
+        info.create_user,
+        info.create_time,
+        info.update_user,
+        info.update_time,
+        info.is_deleted,
+        info.create_user_name,
+        info.update_user_name,
+        info.org_code,
+        info.org_name,
+        app.app_name as appTypeName,
+        app.equipment_id
+        from
+        ecm_busi_info info
+        left join  ecm_app_def app on info.app_code = app.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiNo != null and busiNo != ''">
+                and info.busi_no = #{busiNo}
+            </if>
+            <if test="appCode != null and appCode != ''">
+                and info.app_code = #{appCode}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectWithAppTypeList" resultType="com.sunyard.ecm.dto.ecm.EcmBusiInfoDTO" databaseId="oracle">
+        select
+        info.busi_id,
+        info.busi_no,
+        info.app_code,
+        info.right_ver,
+        info.tree_type,
+        info.create_user,
+        info.create_time,
+        info.update_user,
+        info.update_time,
+        info.is_deleted,
+        info.create_user_name,
+        info.update_user_name,
+        info.org_code,
+        info.org_name,
+        app.app_name as appTypeName,
+        app.equipment_id
+        from
+        ecm_busi_info info
+        left join  ecm_app_def app on  info.app_code = app.app_code
+        <where>
+            info.is_deleted = 0
+            <if test="busiIds != null and busiIds.size() > 0">
+                and info.busi_id in
+                <foreach collection="busiIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

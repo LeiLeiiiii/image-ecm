@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.sunyard.framework.rpc.config.ProjectNameConfig,\
+  com.sunyard.framework.rpc.config.RpcConfiguration,\
+  com.sunyard.framework.rpc.config.NacosLoadBalancerConfig

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.edm.mapper.DocBsShapeInsideUserMapper">
+
+    <select id="searchListByShapeId" resultType="com.sunyard.edm.dto.DocBsShapeAcceptDTO">
+        SELECT
+            s.accept_type,
+            t.name AS accept_name,
+            s.accept_id
+        FROM doc_bs_shape_inside_user s
+            LEFT JOIN
+                (SELECT
+                    team_id AS id,
+                    team_name AS name
+                FROM doc_sys_team
+                WHERE
+                    is_deleted = 0
+                ) t ON t.id = s.accept_id
+        WHERE
+            shape_id = #{shapeId}
+    </select>
+
+</mapper>

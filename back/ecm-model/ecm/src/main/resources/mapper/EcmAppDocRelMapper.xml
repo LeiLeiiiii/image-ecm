@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmAppDocRelMapper">
+
+    <!--  todo 代码可以实现-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into ecm_app_doc_rel(id, app_code, doc_code,doc_sort,type) values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.id},#{it.appCode}, #{it.docCode}, #{it.docSort},#{it.type})
+        </foreach>
+    </insert>
+
+    <!-- todo 挪位置-->
+    <select id="selectListByAppTypeId" resultType="com.sunyard.ecm.dto.ecm.EcmAppDocRelInfoDTO">
+        SELECT
+            doc_code,
+            doc_name,
+            doc_id
+        FROM
+            ecm_busi_doc
+        WHERE
+            doc_code IN (
+                        SELECT
+                            eadr.doc_code
+                        FROM ecm_app_doc_rel  eadr
+                            LEFT JOIN ecm_doc_def  edd ON eadr.doc_code = edd.doc_code
+                        WHERE
+                            app_code = #{appCode}
+                            AND type = 1
+                        )
+            AND busi_id = #{busiId}
+    </select>
+
+    <!--  todo 代码可以实现无需适配-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertList" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_app_doc_rel(id, app_code, doc_code,doc_sort,type)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{it.id},#{it.appCode}, #{it.docCode}, #{it.docSort},#{it.type}
+            from dual)
+        </foreach>
+    </insert>
+
+    <!--  todo 无需适配-->
+    <!-- todo 挪位置-->
+    <select id="selectListByAppTypeId" resultType="com.sunyard.ecm.dto.ecm.EcmAppDocRelInfoDTO" databaseId="oracle">
+        SELECT
+            doc_code,
+            doc_name,
+            doc_id
+        FROM ecm_busi_doc
+        WHERE
+                doc_code IN ( SELECT eadr.doc_code FROM ecm_app_doc_rel eadr LEFT JOIN ecm_doc_def edd ON eadr.doc_code = edd.doc_code WHERE app_code = #{appCode} AND type = 1 )
+          AND busi_id = #{busiId}
+    </select>
+</mapper>

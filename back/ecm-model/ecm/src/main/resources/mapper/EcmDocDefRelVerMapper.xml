@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmDocDefRelVerMapper">
+
+    <!--TODO 代码可以实现-->
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into ecm_doc_def_rel_ver(id,doc_name,app_code, doc_code,parent,right_ver,doc_sort,create_user,create_time,update_time)
+        values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.id},#{it.docName},#{it.appCode}, #{it.docCode},
+            #{it.parent},#{it.rightVer},#{it.docSort},
+            #{it.createUser},#{it.createTime},#{it.updateTime})
+        </foreach>
+    </insert>
+    <!--TODO 代码可以实现-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="batchInsert" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_doc_def_rel_ver(id,doc_name,app_code, doc_code,parent,right_ver,doc_sort,create_user,create_time,update_time)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{it.id},#{it.docName},#{it.appCode}, #{it.docCode},
+            #{it.parent},#{it.rightVer},#{it.docSort},
+            #{it.createUser},#{it.createTime},#{it.updateTime}
+            from dual)
+        </foreach>
+    </insert>
+</mapper>

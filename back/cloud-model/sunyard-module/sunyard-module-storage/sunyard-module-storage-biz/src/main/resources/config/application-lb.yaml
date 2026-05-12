@@ -1,0 +1,10 @@
+--- #################### 负载均衡 ####################
+spring:
+  cloud:
+    loadbalancer:
+      nacos:
+        enabled: true #开启nacos权重负载策略，服务权重值相同随机
+      health-check:
+        refetch-instances: true
+        refetch-instances-interval: 5s
+        repeat-health-check: false

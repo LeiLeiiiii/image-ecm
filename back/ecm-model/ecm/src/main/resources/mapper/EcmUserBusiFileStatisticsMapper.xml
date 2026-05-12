@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmUserBusiFileStatisticsMapper">
+    <!--TODO 代码可以实现-->
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into
+        ecm_user_busi_file_statistics
+        (id,org_code,app_code,file_number,create_user,create_time,update_time,stats_user,stats_date)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.orgCode},#{item.appCode},#{item.fileNumber},
+            #{item.createUser},#{item.createTime},#{item.updateTime},#{item.statsUser},
+            #{item.statsDate})
+        </foreach>
+    </insert>
+    <!--TODO 代码可以实现-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertBatch" parameterType="java.util.List" databaseId="oracle">
+        insert into
+        ecm_user_busi_file_statistics
+        (id,org_code,app_code,file_number,create_user,create_time,update_time,stats_user,stats_date)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{item.id},#{item.orgCode},#{item.appCode},#{item.fileNumber},
+            #{item.createUser},#{item.createTime},#{item.updateTime},#{item.statsUser},
+            #{item.statsDate}
+            from dual)
+        </foreach>
+    </insert>
+</mapper>

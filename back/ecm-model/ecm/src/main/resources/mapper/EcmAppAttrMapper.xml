@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmAppAttrMapper">
+    <!--  todo 代码实现可以删除-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into ecm_app_attr(app_attr_id, app_code,
+        attr_code,attr_name,attr_sort,input_type,status,is_key,is_null,tree_show,list_show,query_show,default_value,regex,list_value,create_user,create_time,update_user,update_time)
+        values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.appAttrId}, #{it.appCode}, #{it.attrCode},#{it.attrName}, #{it.attrSort},
+            #{it.inputType},#{it.status}, #{it.isKey}, #{it.isNull}, #{it.treeShow}, #{it.listShow}, #{it.queryShow},#{it.defaultValue},
+            #{it.regex}, #{it.listValue}, #{it.createUser}, #{it.createTime},#{it.updateUser},#{it.updateTime})
+        </foreach>
+    </insert>
+
+    <!--  todo 代码实现可以删除-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertList" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_app_attr(app_attr_id, app_code,
+        attr_code,attr_name,attr_sort,input_type,status,is_key,is_null,tree_show,list_show,query_show,default_value,regex,list_value,create_user,create_time,update_user,update_time)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{it.appAttrId}, #{it.appCode}, #{it.attrCode},#{it.attrName}, #{it.attrSort},
+            #{it.inputType},#{it.status}, #{it.isKey}, #{it.isNull}, #{it.treeShow}, #{it.listShow}, #{it.queryShow},#{it.defaultValue},
+            #{it.regex}, #{it.listValue}, #{it.createUser}, #{it.createTime},#{it.updateUser},#{it.updateTime}
+            from dual)
+        </foreach>
+
+    </insert>
+</mapper>

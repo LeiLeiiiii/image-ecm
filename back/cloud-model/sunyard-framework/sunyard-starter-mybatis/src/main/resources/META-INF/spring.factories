@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.sunyard.framework.mybatis.config.MybatisAutoConfiguration,\
+  com.sunyard.framework.mybatis.config.JacksonAutoConfiguration

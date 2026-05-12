@@ -1,0 +1,113 @@
+spring:
+  cloud:
+    # Spring Cloud Gateway 配置项，对应 GatewayProperties 类
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedHeaders: "*"     # 允许在请求中携带的头信息
+            allowedMethods: "*"     # 允许的跨域ajax的请求方式
+            allowCredentials: true  # 是否允许携带cookie
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true # 请求服务是小写的时候改成true（默认为false轻微服务必须是大写）
+      routes:
+        # -----------------------------------------------------------
+        - id: auth-service #认证服务28081
+          uri: lb://auth-service
+          predicates:
+            - Path=/web-api/auth/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 997 # 添加额外参数，用户log记录
+        #            - name: Retry   #重试过滤器
+        #              args:
+        #                retries: 1   #重试次数
+        #                series: SERVER_ERROR
+        #                methods: GET,POST
+        #                backoff:
+        #                  firstBackoff: 10ms
+        #                  maxBackoff: 50ms
+        #                  factor: 2
+        #                  basedOnPreviousValue: false
+        # -----------------------------------------------------------
+        - id: system-service #系统(基础)服务28082
+          uri: lb://system-service
+          predicates:
+            - Path=/web-api/system/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 0 # 添加额外参数，用户log记录 0标识是基础管理菜单的日志
+        # -----------------------------------------------------------
+        - id: storage-service #存储服务28083
+          uri: lb://storage-service
+          predicates:
+            - Path=/web-api/storage/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 1 # 添加额外参数，用户log记录
+        # -----------------------------------------------------------
+        - id: clm-service #合同比对58087
+          uri: lb://clm-service
+          predicates:
+            - Path=/web-api/clm/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 1 # 添加额外参数，用户log记录
+        # -----------------------------------------------------------
+        - id: ecm-service #企业级影像58081
+          uri: lb://ecm-service
+          predicates:
+            - Path=/web-api/ecm/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 3 # 添加额外参数，用户log记录 3标识是影像菜单日志
+        - id: ecm-service-websocket
+          uri: lb:ws://ecm-service
+          predicates:
+            - Path=/web-api/ecm/ws/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 3 # 添加额外参数，用户log记录 3标识是影像菜单日志
+        - id: ecm-service-websocket-api
+          uri: lb:ws://ecm-service
+          predicates:
+            - Path=/web-api/ecm/api/ws/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 3 # 添加额外参数，用户log记录 3标识是影像菜单日志
+        # -----------------------------------------------------------
+        - id: eam-service #企业级（综合）档案58082
+          uri: lb://eam-service
+          predicates:
+            - Path=/web-api/eam/**
+          filters:
+            - StripPrefix=2  #  转发过滤前缀个数
+            - SetRequestHeader=serverName, 2
+        # -----------------------------------------------------------
+        - id: edm-service #企业级文档58084
+          uri: lb://edm-service
+          predicates:
+            - Path=/web-api/edm/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 4 # 添加额外参数，用户log记录 4标识是企业级（文档）菜单日志
+        # -----------------------------------------------------------
+        - id: afm-service #反欺诈系统58086
+          uri: lb://afm-service
+          predicates:
+            - Path=/web-api/afm/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 5 # 添加额外参数，用户log记录 5标识是反欺诈系统菜单日志
+        # -----------------------------------------------------------
+        - id: ekm-service #企业级知识库58085
+          uri: lb://ekm-service
+          predicates:
+            - Path=/web-api/ekm/**
+          filters:
+            - StripPrefix=2  # 转发过滤前缀个数
+            - SetRequestHeader=serverName, 6 # 添加额外参数，用户log记录

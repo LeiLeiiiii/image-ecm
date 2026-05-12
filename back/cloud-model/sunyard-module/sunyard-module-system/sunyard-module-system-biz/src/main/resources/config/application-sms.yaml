@@ -1,0 +1,14 @@
+sms:
+  alibaba:
+    #阿里云的accessKey
+    accessKeyId: LTAI5XWCjdvuDf
+    #阿里云的accessKeySecret
+    accessKeySecret: FXjcN64ERbvtjbgQIa
+    #短信签名
+    signature: 小小小叮当
+    #模板ID 用于发送固定模板短信使用
+    templateId: SMS_187954848
+    #模板变量 上述模板的变量
+    templateName: code
+    #请求地址 默认为dysmsapi.aliyuncs.com 如无特殊改变可以不用设置
+    requestUrl: dysmsapi.aliyuncs.com

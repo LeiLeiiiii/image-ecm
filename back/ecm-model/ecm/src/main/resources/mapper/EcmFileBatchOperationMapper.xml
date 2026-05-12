@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmFileBatchOperationMapper">
+    <!--TODO 代码可以实现-->
+    <insert id="insertList" parameterType="java.util.List">
+        insert into ecm_file_batch_operation(id, file_id, ecm_busi_log_id)
+        values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.id}, #{it.fileId}, #{it.ecmBusiLogId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBatchByFileId" parameterType="java.util.Collection">
+        delete from ecm_file_batch_operation
+        where file_id in
+        <foreach collection="coll" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!--TODO 代码可以实现-->
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertList" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_file_batch_operation(id, file_id, ecm_busi_log_id)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select #{it.id}, #{it.fileId}, #{it.ecmBusiLogId}
+            from dual)
+        </foreach>
+    </insert>
+</mapper>

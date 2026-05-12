@@ -1,0 +1,21 @@
+--- #################### 外部系统模拟配置 ####################
+sunyard:
+  appId: l6Jv9y5b
+  appSecret: ac1b99d23b30c1e1679b09cc7e737a333ce58a0f
+  publicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAib59uxcsblbyap+pembk6jqw7TCcGX1L9rV3SGhttOEpXF4gR+yGsp7qrLCwlES3Wo7HiYDWPjS4tfH6lerZyw+KFQKTKD08c1Un8Iqxcwgt7TSUKLabqm9H0z2o81woQU5AZt04oxKqHqQSr59D/dZe/Jsefm4VIznZVNf1ijA9wTUU/krkyZSRJqAS3ryH8sS/xrFO7Vvi0anfxgWTpPcFkH6Tn0gfp0mqyc/YETnHGaR16ppkjcm2mqgfhNUUDd2UxYl1/4Zei6Rttu28dPNti9Co5BMcEzhn8/A1l1RbhrV2qtv4uiy5VEXQPZs53zCVTIaX+S7B5rk4KnHgIwIDAQAB
+  privateKey: MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCJvn27FyxuVvJqn6l6ZuTqOrDtMJwZfUv2tXdIaG204SlcXiBH7IaynuqssLCURLdajseJgNY+NLi18fqV6tnLD4oVApMoPTxzVSfwirFzCC3tNJQotpuqb0fTPajzXChBTkBm3TijEqoepBKvn0P91l78mx5+bhUjOdlU1/WKMD3BNRT+SuTJlJEmoBLevIfyxL/GsU7tW+LRqd/GBZOk9wWQfpOfSB+nSarJz9gROccZpHXqmmSNybaaqB+E1RQN3ZTFiXX/hl6LpG227bx0822L0KjkExwTOGfz8DWXVFuGtXaq2/i6LLlURdA9mznfMJVMhpf5LsHmuTgqceAjAgMBAAECggEAXPFRKzWGwGkgp3tWQwY8viOeEF21ZqmZ4T0u4Ie+RseLPg0xIPbjKJF8bcvHSjRXt94Rm6F4bn7qh7JgUFooXRD+LhEPtJ4lNPknuvIKrEC/pIfO1O3qeYUe5NV9M8BiVTZ01DO/LKHCcmxpQ2Fm4leMvkv4tnyW/K7jC5Gw122QWntrYjZhT3gW5Xj5+s5Ek9rYlxNM6vAwqrCtrobojZUG3YWQSsW5AXQPBhyTpXaThxbfwBh2f72gf8Htr9TzsYLGgjG5UxkxxUBv+ejq4i5jai0NhGPqdCO2IfH70pKVid1YKc7u6dLlb1htWju7HtHeF4KBNKnW2VQOic+6kQKBgQD4JlXxcpVi88X/UKXZcoOuQF3wVe5pixRSYlbKmduWgUroXc7/4i5yONnoEWgm3YESZggnCOJ4Wgp1SZUgEnwXN86/zqHpT8H2dPz8VMkzxO+Qe/OgirPsE/T7eJbz/kKnKaVMi6sXUXA5SelGYv6hILH+TqZMs/J8xBb1f0AhyQKBgQCOGgZcXjDOaJZcc4Xa2mqPJ9k3wrZnNvtyD2QrhGvZ25JKxEMRNDj99PIvt3PAltjY1tFNcjmPeJifgNH9Semtb5gHHCCI1QLlG3+T6035OiivP+AjKWOj5QmrietOHFokmZ+nM0pHZyms5hrovsEJeltXKKpvEEJSjysjh6dIiwKBgGWhhcdqb2Zkgq4LgLFrJiVCtXaOKyPM01jeb79wfi/I6j361aGVKAKd6BkUr/xi8c7wPNyH1gEGl4vrxAirqWj08Vc7MLLWeJEQ3uAVdYYfXSJmsaQJyqCgl9A6VlC9zNybwNh1x2+4aeb8r26lcrXZJy0JVzDI7kJNKT4IjOKJAoGAZ7BLxeig+mxMk0dke852hOER2mNFD8mJ7q+Waz6kKALVG6NcQNh3Ya/zbKgTWYt4zbjqXvWjVLItw+2OzKC7V2efaki24MF17FGFZR0E93/dogsc9OtFnpkI1le8EHIVwLEsUyfU4oc/XL9HEV/noY/byJyOyJ33lyCK3NEmWoMCgYB9cTee9lLXgnf9cKWQoIeNSq0HKNozz+nv6a08jT8IvdyoszW/1JYrInuS2rhI/xvezBQWCQdiUQEu9Vk39jqh/izIrN+65N/cN1ChUSGEVniMMSgoNuyvhe4yK5vxhH8jbbGTnYKKpiQazevX5/gE+a7tiC+XxfWoZc/rl0nh4Q==
+  baseUrl: "http://172.1.1.210:8089"
+  referer: "SUNECM"
+  version: 6.1.1
+  #     1.setCorePoolSize(10)      核心线程数10：线程池创建时候初始化的线程数
+  #     2.setMaxPoolSize(15)       最大线程数20：线程池最大的线程数，只有在缓冲队列满了之后才会申请超过核心线程数的线程
+  #     3.setQueueCapacity(100)    缓冲队列200：用来缓冲执行任务的队列
+  #     4.setKeepAliveSeconds(60)  允许线程的空闲时间60秒：当超过了核心线程数之外的线程在空闲时间到达之后会被销毁
+  #     5.executor.setThreadNamePrefix("taskExecutor-"); 线程池名的前缀：设置好了之后可以方便定位处理任务所在的线程池
+  #     8.setAwaitTerminationSeconds 设置线程池中任务的等待时间，如果超过这个时候还没有销毁就强制销毁，以确保应用最后能够被关闭，而不是阻塞住。
+  corePoolSize: 10
+  maxPoolSize: 15
+  queueCapacity: 100
+  keepAliveSeconds: 60
+  threadNamePrefix: "taskExecutor-"
+  awaitTerminationSeconds: 600

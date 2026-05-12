@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmBusiStatisticsMapper">
+
+    <!--todo 代码可以实现-->
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into ecm_busi_statistics(
+        id,
+        org_code,
+        app_code,
+        busi_number,
+        file_number,
+        file_size,
+        create_time,
+        update_time,
+        stats_date
+        )
+        values
+        <foreach collection="list" item="it" separator=",">
+            (#{it.id}, #{it.orgCode}, #{it.appCode},
+            #{it.busiNumber},#{it.fileNumber},
+            #{it.fileSize}, #{it.createTime}, #{it.updateTime}, #{it.statsDate})
+        </foreach>
+    </insert>
+    <!--todo 代码可以实现-->
+    <update id="updateBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE ecm_busi_statistics
+            SET busi_number = #{item.busiNumber},file_number = #{item.fileNumber}, file_size = #{item.fileSize}
+            WHERE org_code = #{item.orgCode}
+                and app_code = #{item.appCode}
+                and stats_date = #{item.statsDate}
+        </foreach>
+    </update>
+    <!--todo 代码可以实现-->
+    <select id="selectCounts" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO">
+        SELECT
+            SUM(busi_number) AS busiTotal,
+            SUM(file_number) AS fileTotal,
+            SUM(file_size) AS storageTotal
+        FROM
+            ecm_busi_statistics
+    </select>
+
+
+    <!--todo 代码可以实现-->
+    <select id="selectCountsDay" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO">
+        SELECT
+            app_code,
+            DATE_FORMAT(create_time, '%Y-%m-%d') AS createDate,
+            SUM(busi_number) AS count
+        FROM
+            ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+            app_code,
+            DATE_FORMAT(create_time, '%Y-%m-%d')
+    </select>
+    <!--todo 代码可以实现-->
+    <select id="selectCountsMoon" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO">
+        SELECT
+            app_code,
+            DATE_FORMAT(create_time, '%Y-%m') AS createDate,
+            SUM(busi_number) AS count
+        FROM
+            ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+            app_code,
+            DATE_FORMAT(create_time, '%Y-%m')
+    </select>
+    <select id="selectCountsYear" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO">
+        SELECT
+            app_code,
+            DATE_FORMAT(create_time, '%Y') AS createDate,
+            SUM(busi_number) AS count
+        FROM
+            ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+            app_code,
+            DATE_FORMAT(create_time, '%Y')
+    </select>
+    <select id="selectEcmBusiStatisticsDTOList" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO">
+        SELECT a.org_code,
+               a.app_code,
+               a.busi_number as day_size,
+               a.file_number,
+               a.file_size,
+               a.create_time,
+               b.app_name
+        FROM ecm_busi_statistics a
+                 left join ecm_app_def b on b.app_code = a.app_code
+        <where>
+            a.create_time &gt;= #{createTimeStart}
+            AND a.create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND a.org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND a.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="sortColumn != null and sortColumn != '' and sortRule != null and sortRule != ''">
+            ORDER BY ${sortColumn} ${sortRule}
+        </if>
+    </select>
+    <select id="trafficPie" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO">
+        SELECT
+            app_code AS appCode,
+            SUM(file_size) AS storageTotal
+        FROM
+            ecm_busi_statistics
+        <where>
+             create_time &gt;= #{createTimeStart}
+             AND create_time &lt;= #{createTimeEnd}
+        <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+            AND org_code IN
+            <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="appCodeList != null and appCodeList.size() > 0 ">
+             AND app_code IN
+             <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                #{item}
+             </foreach>
+        </if>
+        </where>
+        GROUP BY
+            app_code
+
+    </select>
+
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+
+    <insert id="insertBatch" parameterType="java.util.List" databaseId="oracle">
+        insert into ecm_busi_statistics(
+        id,
+        org_code,
+        app_code,
+        busi_number,
+        file_number,
+        file_size,
+        create_time,
+        update_time,
+        stats_Date
+        )
+        <!-- 注意：这里定义了 item="item" -->
+        <foreach collection="list" item="item" index="index" separator=" union all ">
+            (select
+            #{item.id},
+            #{item.orgCode},
+            #{item.appCode},
+            #{item.busiNumber},
+            #{item.fileNumber},
+            #{item.fileSize},
+            #{item.createTime},
+            #{item.updateTime},
+            #{item.statsDate}
+            from dual)
+        </foreach>
+    </insert>
+
+
+<!--    <update id="updateBatch" parameterType="java.util.List" databaseId="oracle">-->
+<!--        <foreach collection="list" item="item" separator=";">-->
+<!--            UPDATE ecm_busi_statistics-->
+<!--            SET busi_number = #{item.busiNumber},file_number = #{item.fileNumber}, file_size = #{item.fileSize}-->
+<!--            WHERE org_code = #{item.orgCode}-->
+<!--            and app_code = #{item.appCode}-->
+<!--            and stats_date = #{item.statsDate}-->
+<!--        </foreach>-->
+<!--    </update>-->
+    <update id="updateBatch" parameterType="java.util.List" databaseId="oracle">
+        MERGE INTO ecm_busi_statistics T1
+        USING (
+        <foreach collection="list" item="item" separator="UNION ALL">
+            SELECT
+            #{item.busiNumber} AS busi_number,
+            #{item.fileNumber} AS file_number,
+            #{item.fileSize} AS file_size,
+            #{item.orgCode} AS org_code,
+            #{item.appCode} AS app_code,
+            #{item.statsDate} AS stats_date
+            FROM DUAL
+        </foreach>
+        ) T2
+        ON (
+        T1.org_code = T2.org_code
+        AND T1.app_code = T2.app_code
+        AND T1.stats_date = T2.stats_date
+        )
+        WHEN MATCHED THEN
+        UPDATE SET
+        T1.busi_number = T2.busi_number,
+        T1.file_number = T2.file_number,
+        T1.file_size = T2.file_size
+    </update>
+
+
+    <select id="selectCounts" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO" databaseId="oracle">
+        SELECT
+            SUM(busi_number) AS busiTotal,
+            SUM(file_number) AS fileTotal,
+            SUM(file_size) AS storageTotal
+        FROM
+            ecm_busi_statistics
+    </select>
+<!--    TODO TO_CHAR he DATE_FORMAT-->
+    <select id="selectCountsDay" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO" databaseId="oracle">
+        SELECT
+        app_code,
+        -- 【修改点 1】使用 TRUNC 去掉时分秒，但保持类型为 DATE
+        -- 这样 MyBatis 会将其映射为 java.util.Date (例如: 2026-03-16 00:00:00)
+        TRUNC(create_time) AS createDate,
+
+        SUM(busi_number) AS count
+        FROM
+        ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        app_code,
+        -- 【修改点 2】GROUP BY 也要对应改为 TRUNC
+        TRUNC(create_time)
+    </select>
+    <select id="selectCountsMoon" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO" databaseId="oracle">
+        SELECT
+        app_code,
+        -- 【关键修改】使用 TRUNC(create_time, 'MM')
+        -- 这将返回当月的第一天 (例如: 2026-03-01 00:00:00)，类型仍是 Oracle DATE
+        -- Java 端会自动映射为 java.util.Date，不会报错
+        TRUNC(create_time, 'MM') AS createDate,
+
+        SUM(busi_number) AS count
+        FROM
+        ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        app_code,
+        -- 【关键修改】GROUP BY 必须与 SELECT 中的表达式一致
+        TRUNC(create_time, 'MM')
+    </select>
+    <select id="selectCountsYear" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO" databaseId="oracle">
+        SELECT
+            app_code,
+            TO_CHAR(create_time, 'YYYY') AS createDate,
+            SUM(busi_number) AS count
+        FROM
+            ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+            app_code,
+            TO_CHAR(create_time, 'YYYY')
+    </select>
+
+    <select id="selectEcmBusiStatisticsDTOList" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO" databaseId="oracle">
+        SELECT a.org_code,
+               a.app_code,
+               a.busi_number as day_size,
+               a.file_number,
+               a.file_size,
+               a.create_time,
+               b.app_name
+        FROM ecm_busi_statistics a
+                 left join ecm_app_def b on b.app_code = a.app_code
+        <where>
+            a.create_time &gt;= #{createTimeStart}
+            AND a.create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND a.org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND a.app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="sortColumn != null and sortColumn != '' and sortRule != null and sortRule != ''">
+            ORDER BY ${sortColumn} ${sortRule}
+        </if>
+    </select>
+    <select id="trafficPie" resultType="com.sunyard.ecm.dto.ecm.statistics.EcmBusiStatisticsDTO" databaseId="oracle">
+        SELECT
+            app_code AS appCode,
+            SUM(file_size) AS storageTotal
+        FROM
+            ecm_busi_statistics
+        <where>
+            create_time &gt;= #{createTimeStart}
+            AND create_time &lt;= #{createTimeEnd}
+            <if test="orgCodeList != null and orgCodeList.size() > 0 ">
+                AND org_code IN
+                <foreach collection="orgCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="appCodeList != null and appCodeList.size() > 0 ">
+                AND app_code IN
+                <foreach collection="appCodeList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+            app_code
+
+    </select>
+</mapper>

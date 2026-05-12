@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmBusiDocMapper">
+    <select id="selectDtdCode" resultType="com.sunyard.ecm.dto.ecm.EcmFileAutoDTO">
+        SELECT
+            b.busi_id,
+            d.dtd_code,
+            b.doc_id,
+            b.doc_code ,
+            b.doc_name,
+            a.dtd_attr_id,
+            a.attr_code,
+            a.attr_name,
+            a.regex,
+            d.dtd_type_id,
+            d.dtd_name
+        FROM ecm_busi_doc  b
+            LEFT JOIN ecm_dtd_doc_rel AS r ON b.doc_code = r.doc_code
+            LEFT JOIN ecm_dtd_def AS d ON r.dtd_type_id = d.dtd_type_id
+            LEFT JOIN ecm_dtd_attr AS a ON a.dtd_type_id = d.dtd_type_id
+        WHERE
+            b.busi_id = #{busiId}
+            AND d.dtd_code IS NOT NULL
+        ORDER BY a.attr_sort ASC
+    </select>
+
+    <!-- todo 挪位置-->
+    <select id="staticTreeselectDtdCode" resultType="com.sunyard.ecm.dto.ecm.EcmFileAutoDTO">
+        SELECT
+            b.app_code,
+            b.doc_code,
+            d.dtd_code,
+            a.dtd_attr_id,
+            a.attr_code,
+            a.attr_name,
+            a.regex,
+            d.dtd_type_id,
+            d.dtd_name
+        FROM ecm_app_doc_rel  b
+            LEFT JOIN ecm_dtd_doc_rel  r ON b.doc_code = r.doc_code
+            LEFT JOIN ecm_dtd_def  d ON r.dtd_type_id = d.dtd_type_id
+            LEFT JOIN ecm_dtd_attr  a ON a.dtd_type_id = d.dtd_type_id
+        WHERE
+            b.app_code = #{appCode}
+            AND d.dtd_code IS NOT NULL
+        ORDER BY a.attr_sort ASC
+    </select>
+    <!--  todo 无需适配-->
+<!--    oracle   -->
+    <select id="selectDtdCode" resultType="com.sunyard.ecm.dto.ecm.EcmFileAutoDTO" databaseId="oracle">
+        SELECT
+            b.busi_id,
+            d.dtd_code,
+            b.doc_id,
+            b.doc_code ,
+            b.doc_name,
+            a.dtd_attr_id,
+            a.attr_code,
+            a.attr_name,
+            a.regex,
+            d.dtd_type_id,
+            d.dtd_name
+        FROM
+            ecm_busi_doc b
+                LEFT JOIN ecm_dtd_doc_rel  r on b.doc_code = r.doc_code
+                LEFT JOIN ecm_dtd_def d on r.dtd_type_id = d.dtd_type_id
+                LEFT JOIN ecm_dtd_attr a on a.dtd_type_id = d.dtd_type_id
+        WHERE
+            b.busi_id = #{busiId}
+          AND d.dtd_code IS NOT NULL
+        ORDER BY
+            a.attr_sort ASC
+    </select>
+    <!--  todo 无需适配-->
+    <!-- todo 挪位置-->
+    <select id="staticTreeselectDtdCode" resultType="com.sunyard.ecm.dto.ecm.EcmFileAutoDTO" databaseId="oracle">
+        SELECT
+            b.app_code,
+            b.doc_code,
+            d.dtd_code,
+            a.dtd_attr_id,
+            a.attr_code,
+            a.attr_name,
+            a.regex,
+            d.dtd_type_id,
+            d.dtd_name
+        FROM
+            ecm_app_doc_rel b
+                LEFT JOIN ecm_dtd_doc_rel  r on b.doc_code = r.doc_code
+                LEFT JOIN ecm_dtd_def d on r.dtd_type_id = d.dtd_type_id
+                LEFT JOIN ecm_dtd_attr a on a.dtd_type_id = d.dtd_type_id
+        WHERE
+            b.app_code = #{appCode}
+          AND d.dtd_code IS NOT NULL
+        ORDER BY
+            a.attr_sort ASC
+    </select>
+</mapper>

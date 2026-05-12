@@ -1,0 +1,16 @@
+spring:
+  main:
+    #allow-circular-references: true # 允许循环依赖，因为项目是三层架构，无法避免这个情况。
+    allow-bean-definition-overriding: true # 允许 Bean 覆盖，例如说 Dubbo 或者 Feign 等会存在重复定义的服务
+  jackson:
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+--- #################### feign 连接池配置 ####################
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 2000000 # 连接超时时间，单位毫秒
+        readTimeout: 2000000    # 读取超时时间，单位毫秒

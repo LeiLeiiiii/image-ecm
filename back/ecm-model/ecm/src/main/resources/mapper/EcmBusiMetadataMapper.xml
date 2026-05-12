@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.EcmBusiMetadataMapper">
+
+    <select id="complexSelect" resultType="java.lang.Long">
+        SELECT
+            busi_id
+        FROM ecm_busi_metadata
+        <where>
+            <foreach collection="list" item="item" open="(" separator=" ) or ( " close=")">
+                app_attr_id IN (
+                                SELECT
+                                    app_attr_id
+                                FROM ecm_app_attr
+                                WHERE
+                                    app_code IN
+                                        <foreach item="appCode" index="index" collection="appTypeIds" open="(" separator="," close=")">
+                                            #{appCode}
+                                        </foreach>
+                                        AND attr_code = #{item.attrCode}
+                                )
+                <if test="item.inputType == 2">
+                    AND DATE(app_attr_val) BETWEEN SUBSTRING_INDEX(#{item.appAttrValue}, ',', 1) AND SUBSTRING_INDEX(#{item.appAttrValue}, ',', -1)
+                </if>
+                <if test="item.inputType == 1">
+                    AND app_attr_val LIKE CONCAT(#{item.appAttrValue}, '%')
+                </if>
+                <if test="item.inputType != 1 and item.inputType != 2">
+                    AND app_attr_val = #{item.appAttrValue}
+                </if>
+            </foreach>
+        </where>
+        GROUP BY busi_id
+        HAVING COUNT(1) = #{size}
+    </select>
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <!--todo date()函数 TRUNC-->
+    <select id="complexSelect" resultType="java.lang.Long" databaseId="oracle">
+        SELECT busi_id FROM ecm_busi_metadata
+        <where>
+            <foreach collection="list" item="item" open="(" separator=" ) or ( " close=")">
+                app_attr_id in (SELECT app_attr_id FROM ecm_app_attr where app_code in
+                <foreach item="appCode" index="index" collection="appTypeIds" open="(" separator="," close=")">
+                    #{appCode}
+                </foreach>
+                and attr_code = #{item.attrCode})
+                <if test="item.inputType == 2">
+                    <choose>
+                        <when test="item.appAttrValue.indexOf(',') >= 0">
+                            and app_attr_val between SUBSTR(#{item.appAttrValue}, 1, INSTR(#{item.appAttrValue}, ',') - 1)
+                            and SUBSTR(#{item.appAttrValue}, INSTR(#{item.appAttrValue}, ',') +1)
+                        </when>
+                        <otherwise>
+                            and app_attr_val = #{item.appAttrValue}
+                        </otherwise>
+                    </choose>
+                </if>
+                <if test="item.inputType == 1">
+                    and app_attr_val like CONCAT(#{item.appAttrValue}, '%')
+                </if>
+                <if test="item.inputType != 1 and item.inputType != 2">
+                    and app_attr_val = #{item.appAttrValue}
+                </if>
+            </foreach>
+        </where>
+        group by busi_id
+        having count(1) = #{size}
+    </select>
+</mapper>

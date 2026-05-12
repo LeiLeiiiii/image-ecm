@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.ecm.mapper.SysBusiLogMapper">
+
+    <!--todo 代码可以实现-->
+    <insert id="insertBatch" parameterType="java.util.Collection">
+        insert into ecm_busi_log(id, app_code,app_name,busi_no,operate_content,
+                                 operator,operator_id,create_time,org_code,error_info)
+        values
+        <foreach collection="coll" item="it" separator=",">
+            (#{it.id}, #{it.appCode}, #{it.appName},#{it.busiNo}, #{it.operateContent},
+            #{it.operator},#{it.operatorId}, #{it.createTime}, #{it.orgCode}, #{it.errorInfo})
+        </foreach>
+    </insert>
+    <!-- ====================================== ↓↓↓↓↓↓ oracle ↓↓↓↓↓↓  ====================================== -->
+    <insert id="insertBatch" parameterType="java.util.Collection" databaseId="oracle">
+        insert into ecm_busi_log(id, app_code,app_name,busi_no,operate_content,
+        operator,operator_id,create_time,org_code,error_info)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            (select
+            #{it.id}, #{it.appCode}, #{it.appName},#{it.busiNo}, #{it.operateContent},
+            #{it.operator},#{it.operatorId}, #{it.createTime}, #{it.orgCode}, #{it.errorInfo}
+            from dual)
+        </foreach>
+    </insert>
+</mapper>

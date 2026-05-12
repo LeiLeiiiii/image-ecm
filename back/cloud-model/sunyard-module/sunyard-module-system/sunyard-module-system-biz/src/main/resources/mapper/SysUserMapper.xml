@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sunyard.module.system.mapper.SysUserMapper">
+
+    <select id="search" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+        a.*,
+        b.name AS dept_name,
+        c.name AS inst_name
+        FROM sys_user a
+        LEFT JOIN sys_inst c ON a.inst_id = c.inst_id AND c.newlevel=0
+        LEFT JOIN sys_dept b ON a.dept_id = b.dept_id AND b.newlevel=0
+        <if test="null != deptId and 0!=deptId">
+            JOIN (
+            SELECT
+            d.*
+            FROM sys_dept d
+            WHERE
+            d.dept_id=#{deptId}
+            OR d.parent_id=#{deptId}
+            ) dd ON a.dept_id=dd.dept_id AND dd.newlevel = 0
+        </if>
+        WHERE
+        1=1
+        AND a.is_deleted=0
+        <!-- ✅ 修改点 1: 使用 || 连接符 -->
+        <if test="null != user.loginName and '' != user.loginName">
+            AND a.login_name LIKE #{user.loginName} || '%'
+        </if>
+        <!-- ✅ 修改点 2 -->
+        <if test="null != user.code and '' != user.code">
+            AND a.code LIKE #{user.code} || '%'
+        </if>
+        <!-- ✅ 修改点 3 -->
+        <if test="null != user.name and '' != user.name">
+            AND a.name LIKE #{user.name} || '%'
+        </if>
+        <if test="null != user.deptId">
+            AND a.dept_id = #{user.deptId}
+        </if>
+        <if test="null != user.instId">
+            AND a.inst_id = #{user.instId}
+        </if>
+        AND a.state IN
+        <foreach collection="user.stateList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ORDER BY a.create_time DESC
+    </select>
+
+<!--    <select id="search" resultType="com.sunyard.module.system.api.dto.SysUserDTO">-->
+<!--        SELECT-->
+<!--            a.*,-->
+<!--            b.name AS dept_name,-->
+<!--            c.name AS inst_name-->
+<!--        FROM sys_user a-->
+<!--            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id AND c.newlevel=0-->
+<!--            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id AND b.newlevel=0-->
+<!--        <if test="null != deptId and 0!=deptId">-->
+<!--            JOIN (-->
+<!--                SELECT-->
+<!--                    d.*-->
+<!--                FROM sys_dept d-->
+<!--                WHERE-->
+<!--                    d.dept_id=#{deptId}-->
+<!--                    OR d.parent_id=#{deptId}-->
+<!--                ) dd ON a.dept_id=dd.dept_id AND dd.newlevel = 0-->
+<!--        </if>-->
+<!--        WHERE-->
+<!--            1=1-->
+<!--            AND a.is_deleted=0-->
+<!--        <if test="null != user.loginName and '' != user.loginName">-->
+<!--            AND a.login_name LIKE CONCAT(CONCAT(#{user.loginName},'%'))-->
+<!--        </if>-->
+<!--        <if test="null != user.code and '' != user.code">-->
+<!--            AND a.code LIKE CONCAT(CONCAT(#{user.code},'%'))-->
+<!--        </if>-->
+<!--        <if test="null != user.name and '' != user.name">-->
+<!--            AND a.name LIKE CONCAT(CONCAT(#{user.name},'%'))-->
+<!--        </if>-->
+<!--        <if test="null != user.deptId">-->
+<!--            AND a.dept_id = #{user.deptId}-->
+<!--        </if>-->
+<!--        <if test="null != user.instId">-->
+<!--            AND a.inst_id = #{user.instId}-->
+<!--        </if>-->
+<!--            AND a.state IN-->
+<!--        <foreach collection="user.stateList" item="item" open="(" close=")" separator=",">-->
+<!--            #{item}-->
+<!--        </foreach>-->
+<!--        ORDER BY a.create_time DESC-->
+<!--    </select>-->
+    <select id="selectOrg" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+            a.*,
+            b.name AS dept_name,
+            c.name AS inst_name,
+            c.inst_no,
+            m.perms AS default_menu
+        FROM sys_user a
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id AND c.newlevel = 0
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id AND b.newlevel = 0
+            LEFT JOIN sys_menu_default md ON a.user_id = md.user_id AND md.is_deleted = 0
+            LEFT JOIN sys_menu m ON m.menu_id = md.menu_id AND m.is_deleted = 0
+        WHERE
+            1 = 1
+            AND a.is_deleted = 0
+            AND a.user_id = #{userId}
+    </select>
+    <select id="selectThink" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+            a.*,
+            b.name AS dept_name,
+            c.name AS inst_name
+        FROM sys_user a
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id
+        WHERE
+            a.name LIKE CONCAT('%', CONCAT(#{thinkString}, '%'))
+            OR a.login_name LIKE CONCAT('%', CONCAT(#{thinkString}, '%'))
+            OR a.user_id LIKE CONCAT('%', CONCAT(#{thinkString}, '%'))
+    </select>
+    <select id="selectByDeptId" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+            a.*,
+            b.name_level AS dept_name,
+            c.name_level AS inst_name
+        FROM sys_user a
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id
+        WHERE
+            1=1
+            AND a.state = 1
+        <if test="deptId != null and deptId != ''">
+            AND a.dept_id = #{deptId}
+        </if>
+        <if test="code != null and code != ''">
+            AND a.code = #{code}
+        </if>
+        <if test="name != null and name != ''">
+            AND a.name = #{name}
+        </if>
+        <if test="instId != null and instId != ''">
+            AND a.inst_id = #{instId}
+        </if>
+            AND a.is_deleted = 0
+            AND b.newlevel = 0
+            AND c.newlevel = 0
+    </select>
+    <select id="searchRoleByDpt" resultType="com.sunyard.module.system.po.SysUser">
+        SELECT
+            *
+        FROM sys_user a
+                 JOIN (
+                        SELECT
+                           user_id
+                        FROM sys_role_user
+                        WHERE
+                           role_id =
+                                    (SELECT
+                                        role_id
+                                    FROM sys_role
+                                    WHERE
+                                        inst_id = #{instId}
+                                        AND NAME = #{roleName}
+                                        AND is_deleted = 0
+                                    )
+                            AND is_deleted = 0
+                       ) b ON a.user_id = b.user_id
+        WHERE
+            a.dept_id = #{deptId}
+            AND a.is_deleted = 0
+    </select>
+    <select id="getUserByRoleIdorDeptId" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+            DISTINCT a.*,
+            b.name_level AS dept_name
+        FROM sys_user a
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id
+            LEFT JOIN sys_role_user d on d.user_id = a.user_id
+        WHERE
+            1=1
+            AND a.state = 1
+            AND d.is_deleted = 0
+        <if test="instId != null and instId != ''">
+            AND a.inst_id = #{instId}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            AND b.dept_id = #{deptId}
+        </if>
+        <if test="roleId != null and roleId != ''">
+            AND d.role_id = #{roleId}
+        </if>
+        <if test="type == null and roleId != '' and type == 1">
+            AND a.is_deleted = 0
+            AND b.is_deleted = 0
+        </if>
+        <if test="type == null and roleId != '' and type == 0">
+            AND d.is_deleted = 0
+        </if>
+    </select>
+    <select id="exportList" resultType="com.sunyard.module.system.api.dto.SysUserExportDTO">
+        SELECT
+            a.login_name,
+            a.name,
+            b.name AS dept_name,
+            c.name AS inst_name,
+            a.code,
+            CASE a.sex WHEN 1 THEN '男' ELSE '女' END AS sex,
+            a.phone,
+            a.email
+        FROM sys_user a
+            LEFT JOIN sys_dept b ON a.dept_id = b.dept_id
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id
+        WHERE
+            a.is_deleted = 0
+    </select>
+    <select id="getAllUserInfo" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+            a.*,
+            a.login_name,
+            c.inst_no
+        FROM sys_user a
+            LEFT JOIN sys_inst c ON a.inst_id = c.inst_id AND c.newlevel=0
+    </select>
+    <select id="searchUserByConditions" resultType="com.sunyard.module.system.api.dto.SysUserDTO">
+        SELECT
+            u.user_id AS userId,
+            u.dept_id AS deptId,
+            u.name AS name,
+            u.code AS code
+        FROM sys_user u
+        <where>
+            u.is_deleted = 0
+            <if test="deptId != null">
+                AND u.dept_id = #{deptId}
+            </if>
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="code != null and code != ''">
+                AND u.code = #{code}
+            </if>
+            <if test="postName != null and postName != ''">
+                AND EXISTS (
+                    SELECT 1
+                        FROM sys_post_user pu2
+                            INNER JOIN sys_post p2 ON pu2.post_id = p2.post_id
+                                WHERE pu2.user_id = u.user_id
+                                    AND pu2.is_deleted = 0
+                                    AND p2.is_deleted = 0
+                                    AND p2.name LIKE CONCAT('%', #{postName}, '%')
+                )
+            </if>
+        </where>
+    </select>
+</mapper>
